@@ -22,8 +22,8 @@ git config --global user.email "<Your Email>"
 ## Cloning the project
 
 ```
-git clone https://git.cardiff.ac.uk/c21024669/group-text-based-game.git
-cd group-text-based-game
+git clone https://github.com/dominikalk/ProjectOutlaw.git
+cd ProjectOutlaw
 ```
 
 This will only work if you have access to the repo.
