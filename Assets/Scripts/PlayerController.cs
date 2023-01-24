@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private float PlayerSpeed;
+    [SerializeField] private float playerSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -19,18 +19,24 @@ public class PlayerController : MonoBehaviour
         float xVelocity = 0;
         float yVelocity = 0;
 
-        if (Input.GetKey(KeyCode.W)) {
-            yVelocity = PlayerSpeed;
-        } else if (Input.GetKey(KeyCode.S)) {
-            yVelocity = -PlayerSpeed;
-        } 
-        
-        if (Input.GetKey(KeyCode.A)) {
-            xVelocity = -PlayerSpeed;
-        } else if (Input.GetKey(KeyCode.D)) {
-            xVelocity = PlayerSpeed;
-        } 
-        
+        if (Input.GetKey(KeyCode.W))
+        {
+            yVelocity = playerSpeed;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            yVelocity = -playerSpeed;
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            xVelocity = -playerSpeed;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            xVelocity = playerSpeed;
+        }
+
         rb.velocity = new Vector2(xVelocity, yVelocity);
     }
 }
