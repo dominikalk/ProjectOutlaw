@@ -1,42 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float playerSpeed;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+    private NetworkVariable<int> randomNumber = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    public override void OnNetworkSpawn()
+    {
+        randomNumber.OnValueChanged += (int previousValue, int newValue) =>
+        {
+            Debug.Log(OwnerClientId + "; randomNumber:" + randomNumber.Value);
+        };
     }
 
-    // Update is called once per frame
     void Update()
     {
-        float xVelocity = 0;
-        float yVelocity = 0;
+        if (!IsOwner) return;
 
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.T))
         {
-            yVelocity = playerSpeed;
+            randomNumber.Value = Random.Range(0, 100);
         }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            yVelocity = -playerSpeed;
-        }
+        Vector2 playerVelocity = new Vector2(0, 0);
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            xVelocity = -playerSpeed;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            xVelocity = playerSpeed;
-        }
+        if (Input.GetKey(KeyCode.W)) playerVelocity.y = playerSpeed;
+        else if (Input.GetKey(KeyCode.S)) playerVelocity.y = -playerSpeed;
+        if (Input.GetKey(KeyCode.A)) playerVelocity.x = -playerSpeed;
+        else if (Input.GetKey(KeyCode.D)) playerVelocity.x = playerSpeed;
 
-        rb.velocity = new Vector2(xVelocity, yVelocity);
+        rb.velocity = playerVelocity;
     }
 }
