@@ -10,11 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 5581208821649909229}
   - component: {fileID: 5581208821649909234}
-  - component: {fileID: 5581208821649909235}
+  - component: {fileID: 4207043725777333511}
   - component: {fileID: 5581208821649909232}
   - component: {fileID: 5581208821649909233}
   - component: {fileID: 5581208821649909228}
-  - component: {fileID: 4222880077375862352}
+  - component: {fileID: 8916537366311970196}
+  - component: {fileID: 5166065418177939639}
   m_Layer: 0
   m_Name: Sheriff
   m_TagString: Untagged
@@ -90,7 +91,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5581208821649909235
+--- !u!114 &4207043725777333511
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,11 +100,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5581208821649909238}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69dbf88ea8acf7f4d81fd8f514627a18, type: 3}
+  m_Script: {fileID: 11500000, guid: 367b91fb99689cc4bb9779f6b46d80d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 5581208821649909233}
-  playerSpeed: 10
+  movementSpeed: 10
 --- !u!61 &5581208821649909232
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -167,7 +167,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &4222880077375862352
+--- !u!114 &8916537366311970196
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5581208821649909238}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -193,6 +193,18 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!114 &5166065418177939639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5581208821649909238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5581208822179816545
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5581208822179816605
 Transform:
   m_ObjectHideFlags: 0
