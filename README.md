@@ -5,7 +5,7 @@ This is a multiplayer social game developed at Cardiff University as part of a G
 ## Contributors
 
 - Dominik Alkhovik
-- Contributor 2
+- Tomos Jones
 - Contributor 3
 - Contributor 4
 - Contributor 5
