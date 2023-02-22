@@ -10,7 +10,6 @@ This is a multiplayer social game developed at Cardiff University as part of a G
 - Contributor 4
 - Contributor 5
 - Contributor 6
-- Contributor 7
 
 ## Git global setup
 
