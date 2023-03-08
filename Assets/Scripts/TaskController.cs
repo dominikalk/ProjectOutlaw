@@ -11,20 +11,27 @@ public class TaskController : NetworkBehaviour
     public NetworkVariable<float> completingStart =
         new NetworkVariable<float>(Mathf.Infinity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-
     private void Update()
     {
         // Temp Code : Progress Bar For Task Completion
-        float timePassed = timeToComplete - (Time.time - completingStart.Value);
+        float timePassed = timeToComplete - ((float)NetworkManager.Singleton.LocalTime.Time - completingStart.Value);
         if (timePassed > timeToComplete) timePassed = timeToComplete;
         Transform scale = gameObject.transform.GetChild(1).transform;
         if (scale != null) scale.localScale = new Vector3(timePassed / timeToComplete, 0.2f, 1f);
 
+        if (!IsOwner) return;
+
         // Code When Task Gets Completed
-        if (Time.time - completingStart.Value >= timeToComplete)
+        if (NetworkManager.Singleton.LocalTime.Time - completingStart.Value >= timeToComplete)
         {
             FindObjectOfType<GameManager>().IncTasksCompletedServerRpc();
-            GetComponent<NetworkObject>().Despawn();
+            DespawnServerRpc();
         }
+    }
+
+    [ServerRpc]
+    private void DespawnServerRpc()
+    {
+        GetComponent<NetworkObject>().Despawn();
     }
 }
