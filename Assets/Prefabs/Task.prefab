@@ -233,7 +233,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30536c39d1069884b93009440c019046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeToComplete: 5
+  timeToComplete: 2
+  taskName: 
   completingStart:
     m_InternalValue: Infinity
 --- !u!58 &3768839803279109326
