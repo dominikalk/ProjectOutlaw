@@ -11,8 +11,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private float movementSpeed;
     [SerializeField] private float taskRadius;
 
-    // Temp - make private again
-    public TaskController taskInRadius = null;
+    private TaskController taskInRadius = null;
 
 
     private void Start()
@@ -55,7 +54,6 @@ public class Player : NetworkBehaviour
         }
         if (taskInRadius == null || taskInRadius.completingStart.Value <= Time.time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
-        Debug.Log("Should Be Starting");
         StartTaskServerRpc(Time.time, taskInRadius.NetworkObjectId);
     }
 
@@ -94,7 +92,6 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     public void StartTaskServerRpc(float start, ulong taskId)
     {
-        Debug.Log("Start: " + OwnerClientId);
         TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
         if (taskInRadius == null) return;
         taskInRadius.completingStart.Value = start;
@@ -103,7 +100,6 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     public void StopTaskServerRpc(ulong taskId)
     {
-        Debug.Log("End: " + OwnerClientId);
         TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
         if (taskInRadius == null) return;
         taskInRadius.completingStart.Value = Mathf.Infinity;
