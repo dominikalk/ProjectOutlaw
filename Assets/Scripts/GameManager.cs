@@ -21,7 +21,7 @@ public class GameManager : NetworkBehaviour
         if (Time.time - gameStartTime >= gameLength) Debug.Log("Sherrifs Win - Time Ran Out");
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void IncTasksCompletedServerRpc()
     {
         noTasksCompleted++;

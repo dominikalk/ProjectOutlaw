@@ -661,6 +661,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 28268653382477068, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2531631403
+      objectReference: {fileID: 0}
+    - target: {fileID: 1997169719015770156, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4065989526
+      objectReference: {fileID: 0}
     - target: {fileID: 4308249677745173741, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1413,6 +1421,11 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 8103478454775322736, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -1663,6 +1676,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 28268653382477068, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1331722700
+      objectReference: {fileID: 0}
+    - target: {fileID: 1997169719015770156, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 871499410
+      objectReference: {fileID: 0}
     - target: {fileID: 4308249677745173741, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1673,7 +1694,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4308249677745173741, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1175518
+      value: 4.32
       objectReference: {fileID: 0}
     - target: {fileID: 4308249677745173741, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2642,6 +2663,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 28268653382477068, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 667041784
+      objectReference: {fileID: 0}
+    - target: {fileID: 1997169719015770156, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1383690489
+      objectReference: {fileID: 0}
     - target: {fileID: 4308249677745173741, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
       propertyPath: m_RootOrder
       value: 3
