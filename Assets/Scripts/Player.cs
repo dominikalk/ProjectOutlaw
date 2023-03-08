@@ -52,9 +52,9 @@ public class Player : NetworkBehaviour
             if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
             return;
         }
-        if (taskInRadius == null || taskInRadius.completingStart.Value <= Time.time) return;
+        if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
-        StartTaskServerRpc(Time.time, taskInRadius.NetworkObjectId);
+        StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
     }
 
     // Set Task When Within Radius
