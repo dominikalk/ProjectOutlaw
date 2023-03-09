@@ -5,11 +5,14 @@ using Unity.Netcode;
 using System.Linq;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
     [SerializeField] private float gameLength = 120f;
-    private double gameStartTime;
+    private float gameStartTime = Mathf.Infinity;
+    public NetworkVariable<bool> isGamePlaying =
+        new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // Tasks Vars
     private TaskController[] tasks = { };
@@ -29,7 +32,6 @@ public class GameManager : NetworkBehaviour
         BulletsGone,
         NotEnded
     };
-    private GameEndEnum gameEndType = GameEndEnum.NotEnded;
     [SerializeField] private GameObject winLossScreen;
     [SerializeField] private TextMeshProUGUI winLossText;
     [SerializeField] private TextMeshProUGUI winLossDescText;
@@ -61,7 +63,8 @@ public class GameManager : NetworkBehaviour
         }
 
         // Start game time
-        gameStartTime = NetworkManager.Singleton.LocalTime.Time;
+        gameStartTime = (float)NetworkManager.Singleton.LocalTime.Time;
+        isGamePlaying.Value = true;
         StartGameTimeClientRpc();
 
         // Set start game button active to false
@@ -71,24 +74,54 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (Time.time - gameStartTime >= gameLength)
+        // Check if time has run out
+        if (IsServer && NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength)
         {
-            gameEndType = GameEndEnum.TimeOut;
+            ShowWinLossClientRpc(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
 
-        CheckGameOver();
-
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
-
-        // Check if time has run out
-        if (NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength) Debug.Log("Sherrifs Win - Time Ran Out");
     }
 
-    // Checks if the game is over and manipulates win loss screen
-    private void CheckGameOver()
+    // Handles play again button logic
+    public void OnPlayAgainPressed()
     {
-        if (gameEndType == GameEndEnum.NotEnded) return;
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    // Increment number of tasks completed on server
+    [ServerRpc(RequireOwnership = false)]
+    public void IncTasksCompletedServerRpc()
+    {
+        noTasksCompleted++;
+        if (noTasksCompleted >= noOfTasks)
+        {
+            ShowWinLossClientRpc(GameEndEnum.TasksCompleted);
+            Debug.Log("Outlaws Win - Completed All Tasks");
+        }
+    }
+
+    // Despawn task with id on server
+    [ServerRpc]
+    private void DespawnTaskServerRpc(ulong taskId)
+    {
+        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
+        taskInRadius.GetComponent<NetworkObject>().Despawn();
+    }
+
+    // Starts game timescale on all clients
+    [ClientRpc]
+    private void StartGameTimeClientRpc()
+    {
+        Time.timeScale = 1f;
+    }
+
+    // Manipulates Win Loss Screen depending on end of game type
+    [ClientRpc]
+    private void ShowWinLossClientRpc(GameEndEnum gameEndType)
+    {
         winLossScreen.SetActive(true);
         switch (gameEndType)
         {
@@ -111,32 +144,7 @@ public class GameManager : NetworkBehaviour
             default:
                 break;
         }
-    }
-
-    // Increment number of tasks completed on server
-    [ServerRpc(RequireOwnership = false)]
-    public void IncTasksCompletedServerRpc()
-    {
-        noTasksCompleted++;
-        if (noTasksCompleted >= noOfTasks)
-        {
-            gameEndType = GameEndEnum.TasksCompleted;
-            Debug.Log("Outlaws Win - Completed All Tasks");
-        }
-    }
-
-    // Despawn task with id on server
-    [ServerRpc]
-    private void DespawnTaskServerRpc(ulong taskId)
-    {
-        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
-        taskInRadius.GetComponent<NetworkObject>().Despawn();
-    }
-
-    // Starts game timescale on all clients
-    [ClientRpc]
-    private void StartGameTimeClientRpc()
-    {
-        Time.timeScale = 1f;
+        Time.timeScale = 0f;
+        isGamePlaying.Value = false;
     }
 }
