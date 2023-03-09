@@ -106,7 +106,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 10
   taskRadius: 3
-  taskInRadius: {fileID: 0}
 --- !u!61 &5581208821649909232
 BoxCollider2D:
   m_ObjectHideFlags: 0
