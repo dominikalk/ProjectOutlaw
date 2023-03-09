@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -11,8 +13,11 @@ public class Player : NetworkBehaviour
 
     private TaskController taskInRadius = null;
 
+
     private void Start()
     {
+        if (!IsOwner) return;
+
         // Set Radius Of Trigger When Player Spawns
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
     }
@@ -44,17 +49,19 @@ public class Player : NetworkBehaviour
     {
         if (!Input.GetKey(KeyCode.E))
         {
-            if (taskInRadius != null) taskInRadius.StopTaskServerRpc();
+            if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
             return;
         }
-        if (taskInRadius == null || taskInRadius.completingStart <= Time.time) return;
+        if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
-        taskInRadius.StartTaskServerRpc(Time.time);
+        StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
     }
 
     // Set Task When Within Radius
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!IsOwner || collision.gameObject.GetComponent<TaskController>() == null) return;
+
         TaskController task = collision.gameObject.GetComponent<TaskController>();
         if (task != null) taskInRadius = task;
     }
@@ -62,12 +69,13 @@ public class Player : NetworkBehaviour
     // Remove Task When Not Within Radius
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (!IsOwner || collision.gameObject.GetComponent<TaskController>() == null) return;
+
         TaskController task = collision.gameObject.GetComponent<TaskController>();
-        if (task != null)
-        {
-            if (taskInRadius) taskInRadius.StopTaskServerRpc();
-            taskInRadius = null;
-        }
+        if (task == null) return;
+
+        StopTaskServerRpc(task.NetworkObjectId);
+        taskInRadius = null;
     }
 
     [ServerRpc]
@@ -75,9 +83,25 @@ public class Player : NetworkBehaviour
     {
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
-            Debug.Log("Owner Id: " + OwnerClientId);
             var client = NetworkManager.ConnectedClients[OwnerClientId];
             client.PlayerObject.transform.Translate(deltaPos);
         }
+    }
+
+
+    [ServerRpc]
+    public void StartTaskServerRpc(float start, ulong taskId)
+    {
+        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
+        if (taskInRadius == null) return;
+        taskInRadius.completingStart.Value = start;
+    }
+
+    [ServerRpc]
+    public void StopTaskServerRpc(ulong taskId)
+    {
+        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
+        if (taskInRadius == null) return;
+        taskInRadius.completingStart.Value = Mathf.Infinity;
     }
 }

@@ -216,7 +216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30536c39d1069884b93009440c019046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeToComplete: 2
+  timeToComplete: 5
+  completingStart:
+    m_InternalValue: Infinity
 --- !u!58 &3768839803279109326
 CircleCollider2D:
   m_ObjectHideFlags: 0
