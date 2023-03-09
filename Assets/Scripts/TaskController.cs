@@ -8,6 +8,8 @@ using UnityEngine.Networking.Types;
 public class TaskController : NetworkBehaviour
 {
     [SerializeField] private float timeToComplete = 2f;
+    [SerializeField] private String taskName;
+
     public NetworkVariable<float> completingStart =
         new NetworkVariable<float>(Mathf.Infinity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
