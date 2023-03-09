@@ -4110,6 +4110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea8cc2e749f5ddb4f8ecc79f05af17b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameLength: 120
   noOfTasks: 3
   startGameBtn: {fileID: 508641153}
   winLossScreen: {fileID: 1959995233}

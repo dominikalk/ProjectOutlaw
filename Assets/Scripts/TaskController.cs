@@ -31,6 +31,7 @@ public class TaskController : NetworkBehaviour
         }
     }
 
+    // Despawn task on server
     [ServerRpc]
     private void DespawnServerRpc()
     {
