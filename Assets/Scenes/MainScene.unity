@@ -1535,6 +1535,11 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 8103478454775322736, guid: 267f1aa2e53545e4f95168bffa6af61d, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -3845,6 +3850,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea8cc2e749f5ddb4f8ecc79f05af17b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WinLossScreen: {fileID: 1959995233}
+  WinLossText: {fileID: 971673980}
+  WinLossDescText: {fileID: 1092401431}
 --- !u!4 &1664633679
 Transform:
   m_ObjectHideFlags: 0
@@ -5143,7 +5151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1959995234
 RectTransform:
   m_ObjectHideFlags: 0
