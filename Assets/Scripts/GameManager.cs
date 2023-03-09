@@ -68,6 +68,8 @@ public class GameManager : NetworkBehaviour
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
 
+        CheckGameOver();
+
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
         if (NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength) Debug.Log("Sherrifs Win - Time Ran Out");
     }

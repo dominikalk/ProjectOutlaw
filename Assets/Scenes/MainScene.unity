@@ -4112,9 +4112,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noOfTasks: 3
   startGameBtn: {fileID: 508641153}
-  winLossScreen: {fileID: 0}
-  winLossText: {fileID: 0}
-  winLossDescText: {fileID: 0}
+  winLossScreen: {fileID: 1959995233}
+  winLossText: {fileID: 971673980}
+  winLossDescText: {fileID: 1092401431}
 --- !u!4 &1664633679
 Transform:
   m_ObjectHideFlags: 0
@@ -5503,7 +5503,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1959995234
 RectTransform:
   m_ObjectHideFlags: 0
