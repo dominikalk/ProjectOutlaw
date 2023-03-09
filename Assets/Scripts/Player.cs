@@ -13,6 +13,8 @@ public class Player : NetworkBehaviour
 
     private TaskController taskInRadius = null;
 
+    private GameManager gameManager;
+
 
     private void Start()
     {
@@ -20,6 +22,8 @@ public class Player : NetworkBehaviour
 
         // Set Radius Of Trigger When Player Spawns
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
+
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     private void FixedUpdate()
@@ -27,6 +31,12 @@ public class Player : NetworkBehaviour
         if (!IsOwner) return;
 
         CheckMovement();
+    }
+
+    private void Update()
+    {
+        if (!IsOwner) return;
+
         CheckTaskCompleting();
     }
 
@@ -47,7 +57,7 @@ public class Player : NetworkBehaviour
     // Code To Handle Task Completion
     private void CheckTaskCompleting()
     {
-        if (!Input.GetKey(KeyCode.E))
+        if (!Input.GetKey(KeyCode.E) || !gameManager.isGamePlaying.Value)
         {
             if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
             return;
