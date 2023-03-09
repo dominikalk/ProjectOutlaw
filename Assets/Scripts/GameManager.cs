@@ -75,7 +75,7 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         // Check if time has run out
-        if (IsServer && NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength)
+        if (IsServer && isGamePlaying.Value && NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength)
         {
             ShowWinLossClientRpc(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
