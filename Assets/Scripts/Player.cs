@@ -89,6 +89,7 @@ public class Player : NetworkBehaviour
     }
 
 
+    // Sets value of task competion start time on server
     [ServerRpc]
     public void StartTaskServerRpc(float start, ulong taskId)
     {
@@ -97,6 +98,7 @@ public class Player : NetworkBehaviour
         taskInRadius.completingStart.Value = start;
     }
 
+    // Sets value of task competion start time to infinity (i.e. task no started)
     [ServerRpc]
     public void StopTaskServerRpc(ulong taskId)
     {

@@ -2,14 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Collections.LowLevel.Unsafe;
 using System.Linq;
 using UnityEngine.UI;
 using TMPro;
 
 public class GameManager : NetworkBehaviour
 {
-    private float gameLength = 120f;
+    [SerializeField] private float gameLength = 120f;
     private double gameStartTime;
     private TaskController[] tasks = { };
     [SerializeField] int noOfTasks;
@@ -18,20 +17,30 @@ public class GameManager : NetworkBehaviour
     private bool startGamePressed = false;
     [SerializeField] private TextMeshProUGUI text;
 
+    // Pause game until "Start Game" pressed
     public void Start()
     {
         Time.timeScale = 0f;
     }
 
+    // Called when start game is pressed
     public void OnGameStart()
     {
         if (!IsServer) return;
 
         // Remove tasks to leave set remaining number
+        List<int> removedTasksIndexs = new List<int>();
         tasks = FindObjectsOfType<TaskController>();
         for (int i = 0; i < tasks.Length - noOfTasks; i++)
         {
-            DespawnTaskServerRpc(tasks[i].NetworkObjectId);
+            while (true)
+            {
+                int taskIndex = Random.Range(0, tasks.Length);
+                if (removedTasksIndexs.Contains(taskIndex)) continue;
+                removedTasksIndexs.Add(taskIndex);
+                DespawnTaskServerRpc(tasks[taskIndex].NetworkObjectId);
+                break;
+            }
         }
 
         // Start game time
@@ -46,9 +55,12 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
+
+        // Check if time has run out
         if (NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength) Debug.Log("Sherrifs Win - Time Ran Out");
     }
 
+    // Increment number of tasks completed on server
     [ServerRpc(RequireOwnership = false)]
     public void IncTasksCompletedServerRpc()
     {
@@ -56,6 +68,7 @@ public class GameManager : NetworkBehaviour
         if (noTasksCompleted >= noOfTasks) Debug.Log("Outlaws Win - Completed All Tasks");
     }
 
+    // Despawn task with id on server
     [ServerRpc]
     private void DespawnTaskServerRpc(ulong taskId)
     {
@@ -63,6 +76,7 @@ public class GameManager : NetworkBehaviour
         taskInRadius.GetComponent<NetworkObject>().Despawn();
     }
 
+    // Starts game timescale on all clients
     [ClientRpc]
     private void StartGameTimeClientRpc()
     {
