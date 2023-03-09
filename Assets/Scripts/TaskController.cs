@@ -1,37 +1,39 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 
 public class TaskController : NetworkBehaviour
 {
     [SerializeField] private float timeToComplete = 2f;
-    public float completingStart { get; private set; } = Mathf.Infinity;
+    [SerializeField] private String taskName;
+
+    public NetworkVariable<float> completingStart =
+        new NetworkVariable<float>(Mathf.Infinity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Update()
     {
         // Temp Code : Progress Bar For Task Completion
-        float timePassed = timeToComplete - (Time.time - completingStart);
+        float timePassed = timeToComplete - ((float)NetworkManager.Singleton.LocalTime.Time - completingStart.Value);
         if (timePassed > timeToComplete) timePassed = timeToComplete;
-        gameObject.transform.GetChild(1).transform.localScale = new Vector3(timePassed / timeToComplete, 0.2f, 1f);
+        Transform scale = gameObject.transform.GetChild(1).transform;
+        if (scale != null) scale.localScale = new Vector3(timePassed / timeToComplete, 0.2f, 1f);
+
+        if (!IsOwner) return;
 
         // Code When Task Gets Completed
-        if (Time.time - completingStart >= timeToComplete)
+        if (NetworkManager.Singleton.LocalTime.Time - completingStart.Value >= timeToComplete)
         {
             FindObjectOfType<GameManager>().IncTasksCompletedServerRpc();
-            gameObject.SetActive(false);
+            DespawnServerRpc();
         }
     }
 
     [ServerRpc]
-    public void StartTaskServerRpc(float start)
+    private void DespawnServerRpc()
     {
-        completingStart = start;
-    }
-
-    [ServerRpc]
-    public void StopTaskServerRpc()
-    {
-        completingStart = Mathf.Infinity;
+        GetComponent<NetworkObject>().Despawn();
     }
 }

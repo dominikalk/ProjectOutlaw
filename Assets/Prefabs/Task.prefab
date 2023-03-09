@@ -217,6 +217,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeToComplete: 2
+  taskName: 
+  completingStart:
+    m_InternalValue: Infinity
 --- !u!58 &3768839803279109326
 CircleCollider2D:
   m_ObjectHideFlags: 0
