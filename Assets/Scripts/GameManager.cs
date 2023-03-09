@@ -99,7 +99,6 @@ public class GameManager : NetworkBehaviour
             default:
                 break;
         }
-
     }
 
     [ServerRpc(RequireOwnership = false)]
