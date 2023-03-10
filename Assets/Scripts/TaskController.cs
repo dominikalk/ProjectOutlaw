@@ -8,7 +8,7 @@ using UnityEngine.Networking.Types;
 public class TaskController : NetworkBehaviour
 {
     [SerializeField] private float timeToComplete = 2f;
-    [SerializeField] private String taskName;
+    [SerializeField] public string taskName;
 
     public NetworkVariable<float> completingStart =
         new NetworkVariable<float>(Mathf.Infinity, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -21,12 +21,13 @@ public class TaskController : NetworkBehaviour
         Transform scale = gameObject.transform.GetChild(1).transform;
         if (scale != null) scale.localScale = new Vector3(timePassed / timeToComplete, 0.2f, 1f);
 
-        if (!IsOwner) return;
+        if (!IsServer) return;
 
         // Code When Task Gets Completed
         if (NetworkManager.Singleton.LocalTime.Time - completingStart.Value >= timeToComplete)
         {
             FindObjectOfType<GameManager>().IncTasksCompletedServerRpc();
+            CallTaskUIClientRpc();
             DespawnServerRpc();
         }
     }
@@ -36,5 +37,12 @@ public class TaskController : NetworkBehaviour
     private void DespawnServerRpc()
     {
         GetComponent<NetworkObject>().Despawn();
+    }
+
+    // Call task ui on all clients
+    [ClientRpc]
+    private void CallTaskUIClientRpc()
+    {
+        FindObjectOfType<TaskScreenController>()?.CompleteTask(NetworkObjectId);
     }
 }
