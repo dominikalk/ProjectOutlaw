@@ -15,9 +15,9 @@ public class GameManager : NetworkBehaviour
         new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // Tasks Vars
-    private TaskController[] tasks = { };
-    [SerializeField] int noOfTasks;
+    [SerializeField] public int noOfTasks;
     private int noTasksCompleted = 0;
+    [SerializeField] private GameObject tasksScreen;
 
     // Start Game Vars
     [SerializeField] private Button startGameBtn;
@@ -49,7 +49,7 @@ public class GameManager : NetworkBehaviour
 
         // Remove tasks to leave set remaining number
         List<int> removedTasksIndexs = new List<int>();
-        tasks = FindObjectsOfType<TaskController>();
+        TaskController[] tasks = FindObjectsOfType<TaskController>();
         for (int i = 0; i < tasks.Length - noOfTasks; i++)
         {
             while (true)
@@ -65,7 +65,7 @@ public class GameManager : NetworkBehaviour
         // Start game time
         gameStartTime = (float)NetworkManager.Singleton.LocalTime.Time;
         isGamePlaying.Value = true;
-        StartGameTimeClientRpc();
+        StartGameClientRpc();
 
         // Set start game button active to false
         startGamePressed = true;
@@ -77,7 +77,7 @@ public class GameManager : NetworkBehaviour
         // Check if time has run out
         if (IsServer && isGamePlaying.Value && NetworkManager.Singleton.LocalTime.Time - gameStartTime >= gameLength)
         {
-            ShowWinLossClientRpc(GameEndEnum.TimeOut);
+            ShowWinLoss(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
 
@@ -91,6 +91,13 @@ public class GameManager : NetworkBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    // Contains reused code for win loss screen logic
+    private void ShowWinLoss(GameEndEnum gameEndEnum)
+    {
+        ShowWinLossClientRpc(gameEndEnum);
+        isGamePlaying.Value = false;
+    }
+
     // Increment number of tasks completed on server
     [ServerRpc(RequireOwnership = false)]
     public void IncTasksCompletedServerRpc()
@@ -98,7 +105,7 @@ public class GameManager : NetworkBehaviour
         noTasksCompleted++;
         if (noTasksCompleted >= noOfTasks)
         {
-            ShowWinLossClientRpc(GameEndEnum.TasksCompleted);
+            ShowWinLoss(GameEndEnum.TasksCompleted);
             Debug.Log("Outlaws Win - Completed All Tasks");
         }
     }
@@ -113,9 +120,10 @@ public class GameManager : NetworkBehaviour
 
     // Starts game timescale on all clients
     [ClientRpc]
-    private void StartGameTimeClientRpc()
+    private void StartGameClientRpc()
     {
         Time.timeScale = 1f;
+        tasksScreen.SetActive(true);
     }
 
     // Manipulates Win Loss Screen depending on end of game type
@@ -145,6 +153,6 @@ public class GameManager : NetworkBehaviour
                 break;
         }
         Time.timeScale = 0f;
-        isGamePlaying.Value = false;
+        tasksScreen.SetActive(false);
     }
 }
