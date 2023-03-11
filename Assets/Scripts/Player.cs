@@ -24,6 +24,8 @@ public class Player : NetworkBehaviour
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
 
         gameManager = FindObjectOfType<GameManager>();
+
+        transform.position = new Vector3(3, 0, 0);
     }
 
     private void FixedUpdate()
