@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1082292819282269192}
   - component: {fileID: 7721352411423223011}
   - component: {fileID: 8305363678227376374}
+  - component: {fileID: -668294268240006733}
   m_Layer: 0
   m_Name: Guns
   m_TagString: Untagged
@@ -92,7 +93,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6868285128389448840}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -111,3 +112,56 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.7, y: 2.18}
   m_EdgeRadius: 0
+--- !u!60 &-668294268240006733
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6868285128389448840}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.7, y: 2.18}
+    newSize: {x: 3.7, y: 2.18}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.38, y: -0.64}
+      - {x: 0.37, y: -0.69}
+      - {x: 0.42999998, y: -0.91999996}
+      - {x: 0.59, y: -0.91999996}
+      - {x: 0.65, y: -0.88}
+      - {x: 0.66999996, y: -0.63}
+      - {x: 1.49, y: -0.63}
+      - {x: 1.49, y: -0.87}
+      - {x: 1.55, y: -0.91999996}
+      - {x: 1.6899999, y: -0.91999996}
+      - {x: 1.76, y: -0.14999999}
+      - {x: 1.76, y: 0.13}
+      - {x: 1.53, y: 0.52}
+      - {x: 1.51, y: 0.89}
+      - {x: 1.48, y: 0.91999996}
+      - {x: 0.63, y: 1.01}
+      - {x: -0.57, y: 1.01}
+      - {x: -0.61, y: 0.96999997}
+      - {x: -1.53, y: 0.9}
+      - {x: -1.64, y: 0.24}
+      - {x: -1.7199999, y: 0.089999996}
+      - {x: -1.7199999, y: 0.03}
+      - {x: -1.68, y: -0.01}
+      - {x: -1.62, y: -0.91999996}
+      - {x: -1.42, y: -0.91999996}
+      - {x: -1.27, y: -0.71999997}
+      - {x: -0.53999996, y: -0.91999996}
+      - {x: -0.38, y: -0.91999996}
