@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System;
 
 public class GameManager : NetworkBehaviour
 {
@@ -36,6 +37,9 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossText;
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
+    [HideInInspector] public List<GameObject> sheriffs = new List<GameObject>();
+    [HideInInspector] public List<GameObject> outlaws = new List<GameObject>();
+
     // Pause game until "Start Game" pressed
     public void Start()
     {
@@ -54,12 +58,33 @@ public class GameManager : NetworkBehaviour
         {
             while (true)
             {
-                int taskIndex = Random.Range(0, tasks.Length);
+                int taskIndex = UnityEngine.Random.Range(0, tasks.Length);
                 if (removedTasksIndexs.Contains(taskIndex)) continue;
                 removedTasksIndexs.Add(taskIndex);
                 DespawnTaskServerRpc(tasks[taskIndex].NetworkObjectId);
                 break;
             }
+        }
+
+        // Sync up player types on all clients
+        ulong[] sheriffIds = new ulong[sheriffs.Count];
+        for (int i = 0; i < sheriffs.Count; i++)
+        {
+            sheriffIds[i] = sheriffs[i].GetComponent<NetworkObject>().NetworkObjectId;
+        }
+        ulong[] outlawIds = new ulong[outlaws.Count];
+        for (int i = 0; i < outlaws.Count; i++)
+        {
+            outlawIds[i] = outlaws[i].GetComponent<NetworkObject>().NetworkObjectId;
+        }
+        SetPlayerTypesClientRpc(sheriffIds, outlawIds);
+
+        // Ensure each player sees their character in the front
+        Player[] sheriffPlayers = FindObjectsOfType<Sheriff>();
+        Player[] outlawPlayers = FindObjectsOfType<Outlaw>();
+        foreach (Player player in sheriffPlayers.Concat(outlawPlayers))
+        {
+            player.PullZPosFrontClientRpc();
         }
 
         // Start game time
@@ -82,6 +107,12 @@ public class GameManager : NetworkBehaviour
         }
 
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
+
+        // TODO: Dev tool - remove later
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnPlayAgainPressed();
+        }
     }
 
     // Handles play again button logic
@@ -154,5 +185,27 @@ public class GameManager : NetworkBehaviour
         }
         Time.timeScale = 0f;
         tasksScreen.SetActive(false);
+    }
+
+    // On Game Start, sync up player types on all clients
+    [ClientRpc]
+    private void SetPlayerTypesClientRpc(ulong[] sheriffIds, ulong[] outlawIds)
+    {
+        Sheriff[] sheriffs = FindObjectsOfType<Sheriff>();
+        foreach (Sheriff sheriff in sheriffs)
+        {
+            if (sheriffIds.Contains(sheriff.GetComponent<NetworkObject>().NetworkObjectId))
+            {
+                sheriff.enabled = true;
+            }
+        }
+        Outlaw[] outlaws = FindObjectsOfType<Outlaw>();
+        foreach (Outlaw outlaw in outlaws)
+        {
+            if (outlawIds.Contains(outlaw.GetComponent<NetworkObject>().NetworkObjectId))
+            {
+                outlaw.enabled = true;
+            }
+        }
     }
 }
