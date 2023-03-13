@@ -77,4 +77,13 @@ public class Outlaw : Player
         if (taskInRadius == null) return;
         taskInRadius.completingStart.Value = Mathf.Infinity;
     }
+
+    // Enables the task UI only for Outlaws
+    [ClientRpc]
+    public void ShowTaskUIClientRpc()
+    {
+        if (!IsOwner) return;
+
+        Resources.FindObjectsOfTypeAll<TaskScreenController>().FirstOrDefault()?.gameObject.SetActive(true);
+    }
 }

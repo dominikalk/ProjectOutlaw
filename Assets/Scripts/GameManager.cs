@@ -37,8 +37,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossText;
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
-    [HideInInspector] public List<GameObject> sheriffs = new List<GameObject>();
-    [HideInInspector] public List<GameObject> outlaws = new List<GameObject>();
+    [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
+    [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
 
     // Pause game until "Start Game" pressed
     public void Start()
@@ -154,7 +154,14 @@ public class GameManager : NetworkBehaviour
     private void StartGameClientRpc()
     {
         Time.timeScale = 1f;
-        tasksScreen.SetActive(true);
+        foreach (Outlaw outlaw in outlaws)
+        {
+            outlaw.ShowTaskUIClientRpc();
+        }
+        foreach (Sheriff sheriff in sheriffs)
+        {
+            sheriff.HideTasksClientRpc();
+        }
     }
 
     // Manipulates Win Loss Screen depending on end of game type
