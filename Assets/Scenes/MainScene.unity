@@ -4914,10 +4914,8 @@ MonoBehaviour:
   winLossScreen: {fileID: 1959995233}
   winLossText: {fileID: 971673980}
   winLossDescText: {fileID: 1092401431}
-  sheriffs:
-    m_InternalValue: []
-  outlaws:
-    m_InternalValue: []
+  sheriffs: []
+  outlaws: []
 --- !u!4 &1664633679
 Transform:
   m_ObjectHideFlags: 0
@@ -5011,7 +5009,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -5519,7 +5517,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4845276930943762971, guid: 2da3dcc22749e7f4280737786d898334, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000076293945
+      value: 0.000045776367
       objectReference: {fileID: 0}
     - target: {fileID: 4845637959249703711, guid: 2da3dcc22749e7f4280737786d898334, type: 3}
       propertyPath: m_AnchorMax.y

@@ -71,7 +71,7 @@ public class NetworkManagerUI : NetworkBehaviour
     private void AddGameManagerPlayerServerRpc(ulong clientId, bool isSheriff)
     {
         GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
-        if (isSheriff) gameManager.sheriffs.Add(newPlayer);
-        else gameManager.outlaws.Add(newPlayer);
+        if (isSheriff) gameManager.sheriffs.Add(newPlayer.GetComponent<Sheriff>());
+        else gameManager.outlaws.Add(newPlayer.GetComponent<Outlaw>());
     }
 }

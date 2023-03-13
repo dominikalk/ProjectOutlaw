@@ -13,4 +13,17 @@ public class Sheriff : Player
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.green;
     }
+
+    // Hides tasks for the Sheriffs
+    [ClientRpc]
+    public void HideTasksClientRpc()
+    {
+        if (!IsOwner) return;
+
+        foreach (TaskController task in FindObjectsOfType<TaskController>())
+        {
+            task.transform.GetChild(0).GetComponent<Renderer>().enabled = false;
+            task.transform.GetChild(1).GetComponent<Renderer>().enabled = false;
+        }
+    }
 }
