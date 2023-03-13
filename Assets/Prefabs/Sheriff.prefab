@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8916537366311970196}
   - component: {fileID: 5166065418177939639}
   - component: {fileID: 3251757652304832472}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sheriff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
