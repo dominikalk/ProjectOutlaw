@@ -1,3 +1,4 @@
+using QFSW.QC.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,22 +10,16 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed;
-    [SerializeField] private float taskRadius;
+    [SerializeField] protected float taskRadius;
 
-    private TaskController taskInRadius = null;
+    protected GameManager gameManager;
+    protected bool isSheriff;
 
-    private GameManager gameManager;
-
-
-    private void Start()
+    protected virtual void Start()
     {
         if (!IsOwner) return;
 
-        // Set Radius Of Trigger When Player Spawns
-        gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
         gameManager = FindObjectOfType<GameManager>();
-        // Bring Player Character to front only on current client
-        transform.position = new Vector3(0, 0, -1f);
     }
 
     private void FixedUpdate()
@@ -32,13 +27,6 @@ public class Player : NetworkBehaviour
         if (!IsOwner) return;
 
         CheckMovement();
-    }
-
-    private void Update()
-    {
-        if (!IsOwner) return;
-
-        CheckTaskCompleting();
     }
 
     // Code To Handle Player Movement
@@ -55,40 +43,6 @@ public class Player : NetworkBehaviour
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
     }
 
-    // Code To Handle Task Completion
-    private void CheckTaskCompleting()
-    {
-        if (!Input.GetKey(KeyCode.E) || !gameManager.isGamePlaying.Value)
-        {
-            if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
-            return;
-        }
-        if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
-        // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
-        StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
-    }
-
-    // Set Task When Within Radius
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (!IsOwner || collision.gameObject.GetComponent<TaskController>() == null) return;
-
-        TaskController task = collision.gameObject.GetComponent<TaskController>();
-        if (task != null) taskInRadius = task;
-    }
-
-    // Remove Task When Not Within Radius
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (!IsOwner || collision.gameObject.GetComponent<TaskController>() == null) return;
-
-        TaskController task = collision.gameObject.GetComponent<TaskController>();
-        if (task == null) return;
-
-        StopTaskServerRpc(task.NetworkObjectId);
-        taskInRadius = null;
-    }
-
     [ServerRpc]
     private void MovePlayerServerRpc(Vector3 deltaPos)
     {
@@ -99,22 +53,11 @@ public class Player : NetworkBehaviour
         }
     }
 
-
-    // Sets value of task competion start time on server
-    [ServerRpc]
-    public void StartTaskServerRpc(float start, ulong taskId)
+    // Brings the users player to the front of all other players
+    [ClientRpc]
+    public void PullZPosFrontClientRpc()
     {
-        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
-        if (taskInRadius == null) return;
-        taskInRadius.completingStart.Value = start;
-    }
-
-    // Sets value of task competion start time to infinity (i.e. task no started)
-    [ServerRpc]
-    public void StopTaskServerRpc(ulong taskId)
-    {
-        TaskController taskInRadius = FindObjectsOfType<TaskController>().Where(x => x.NetworkObjectId == taskId).FirstOrDefault();
-        if (taskInRadius == null) return;
-        taskInRadius.completingStart.Value = Mathf.Infinity;
+        if (!IsOwner) return;
+        transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
     }
 }

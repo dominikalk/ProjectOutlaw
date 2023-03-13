@@ -10,13 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 5581208821649909229}
   - component: {fileID: 5581208821649909234}
-  - component: {fileID: 4207043725777333511}
   - component: {fileID: 5581208821649909232}
   - component: {fileID: 5581208821649909233}
   - component: {fileID: 5581208821649909228}
   - component: {fileID: 8916537366311970196}
   - component: {fileID: 5166065418177939639}
   - component: {fileID: 3251757652304832472}
+  - component: {fileID: 2914267453504794737}
+  - component: {fileID: 4305222584045630375}
   m_Layer: 6
   m_Name: Sheriff
   m_TagString: Untagged
@@ -92,20 +93,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4207043725777333511
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5581208821649909238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 367b91fb99689cc4bb9779f6b46d80d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementSpeed: 10
-  taskRadius: 3
 --- !u!61 &5581208821649909232
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -223,6 +210,34 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 3
+--- !u!114 &2914267453504794737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5581208821649909238}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2291e18f9fb8b1f44b3aa8c59cba288d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeed: 10
+  taskRadius: 3
+--- !u!114 &4305222584045630375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5581208821649909238}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f28a5a3ba5b4824791af69ce6ae7804, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeed: 10
+  taskRadius: 3
 --- !u!1 &5581208822179816545
 GameObject:
   m_ObjectHideFlags: 0
