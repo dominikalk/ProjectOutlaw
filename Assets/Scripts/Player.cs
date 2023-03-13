@@ -23,6 +23,7 @@ public class Player : NetworkBehaviour
         // Set Radius Of Trigger When Player Spawns
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
         gameManager = FindObjectOfType<GameManager>();
+        // Bring Player Character to front only on current client
         transform.position = new Vector3(0, 0, -1f);
     }
 
