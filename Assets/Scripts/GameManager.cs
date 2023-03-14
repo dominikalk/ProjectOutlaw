@@ -157,10 +157,12 @@ public class GameManager : NetworkBehaviour
         foreach (Outlaw outlaw in outlaws)
         {
             outlaw.ShowTaskUIClientRpc();
+            outlaw.HandlePlayerCameraClientRpc();
         }
         foreach (Sheriff sheriff in sheriffs)
         {
             sheriff.HideTasksClientRpc();
+            sheriff.HandlePlayerCameraClientRpc();
         }
     }
 

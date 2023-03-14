@@ -60,4 +60,14 @@ public class Player : NetworkBehaviour
         if (!IsOwner) return;
         transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
     }
+
+    // Disables main camera and enables child camera for each client's player object
+    [ClientRpc]
+    public void HandlePlayerCameraClientRpc()
+    {
+        if (!IsOwner) return;
+
+        Camera.main.gameObject.SetActive(false); 
+        transform.GetChild(0).gameObject.SetActive(true);
+    }
 }
