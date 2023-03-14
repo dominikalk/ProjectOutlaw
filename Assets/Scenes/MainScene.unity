@@ -4964,7 +4964,7 @@ GameObject:
   - component: {fileID: 1673547475}
   - component: {fileID: 1673547474}
   m_Layer: 0
-  m_Name: TempCamera
+  m_Name: WorldCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
