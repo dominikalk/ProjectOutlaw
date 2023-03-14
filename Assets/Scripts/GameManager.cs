@@ -170,24 +170,26 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void ShowWinLossClientRpc(GameEndEnum gameEndType)
     {
+        bool isSheriff = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Sheriff>().enabled;
+
         winLossScreen.SetActive(true);
         switch (gameEndType)
         {
             case GameEndEnum.TimeOut:
-                winLossText.text = "You Lose";
-                winLossDescText.text = "You Ran Out Of Time!";
+                winLossText.text = isSheriff ? "You Win" : "You Lose";
+                winLossDescText.text = isSheriff ? "The Outlaws Ran Out Of Time!" : "You Ran Out Of Time!";
                 break;
             case GameEndEnum.TasksCompleted:
-                winLossText.text = "You Win";
-                winLossDescText.text = "You Completed All The Tasks";
+                winLossText.text = isSheriff ? "You Lose" : "You Win";
+                winLossDescText.text = isSheriff ? "The Outlaws Completed All Of The Tasks!" : "You Completed All The Tasks!";
                 break;
             case GameEndEnum.OutlawsShot:
-                winLossText.text = "You Lose";
-                winLossDescText.text = "All The OutLaws Were Shot!";
+                winLossText.text = isSheriff ? "You Win" : "You Lose";
+                winLossDescText.text = isSheriff ? "You Shot All Of The Outlaws!" : "All Of The OutLaws Were Shot!";
                 break;
             case GameEndEnum.BulletsGone:
-                winLossText.text = "You Win";
-                winLossDescText.text = "All The Bullets Are Gone!";
+                winLossText.text = isSheriff ? "You Lose" : "You Win";
+                winLossDescText.text = isSheriff ? "You Have Wasted All Of Your Bullets!" : "The Sheriffs Wasted All Of Their Bullets!";
                 break;
             default:
                 break;
