@@ -15,6 +15,9 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<bool> isGamePlaying =
         new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
+    [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
+
     // Tasks Vars
     [SerializeField] public int noOfTasks;
     private int noTasksCompleted = 0;
@@ -37,8 +40,10 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossText;
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
-    [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
-    [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
+    // Sheriff Screen Vars
+    [SerializeField] public int bulletsRemaining;
+    [SerializeField] private GameObject sheriffScreen;
+    [SerializeField] private TextMeshProUGUI bulletsRemainingText;
 
     // Pause game until "Start Game" pressed
     public void Start()
@@ -95,6 +100,8 @@ public class GameManager : NetworkBehaviour
         // Set start game button active to false
         startGamePressed = true;
         startGameBtn.gameObject.SetActive(false);
+
+        ChangeBulletsTextClientRpc(bulletsRemaining);
     }
 
     private void Update()
@@ -127,6 +134,25 @@ public class GameManager : NetworkBehaviour
     {
         ShowWinLossClientRpc(gameEndEnum);
         isGamePlaying.Value = false;
+    }
+
+    // Decrement bullets remaining
+    [ServerRpc(RequireOwnership = false)]
+    public void DecrementBulletsServerRpc()
+    {
+        bulletsRemaining--;
+        ChangeBulletsTextClientRpc(bulletsRemaining);
+        if (bulletsRemaining <= 0)
+        {
+            ShowWinLoss(GameEndEnum.BulletsGone);
+            Debug.Log("Outlaws Win - Sheriffs ran out of bullets");
+        }
+    }
+
+    [ClientRpc]
+    public void ChangeBulletsTextClientRpc(int bullets)
+    {
+        bulletsRemainingText.text = $"Bullets: {bullets}";
     }
 
     // Increment number of tasks completed on server
@@ -163,6 +189,7 @@ public class GameManager : NetworkBehaviour
         {
             sheriff.HideTasksClientRpc();
             sheriff.HandlePlayerCameraClientRpc();
+            sheriff.ShowSheriffUIClientRpc();
         }
     }
 
@@ -196,6 +223,7 @@ public class GameManager : NetworkBehaviour
         }
         Time.timeScale = 0f;
         tasksScreen.SetActive(false);
+        sheriffScreen.SetActive(false);
     }
 
     // On Game Start, sync up player types on all clients
