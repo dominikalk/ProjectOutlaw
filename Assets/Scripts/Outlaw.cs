@@ -7,6 +7,7 @@ using Unity.Netcode;
 public class Outlaw : Player
 {
     private TaskController taskInRadius = null;
+    private GameObject taskPromptText;
 
     protected override void Start()
     {
@@ -17,6 +18,8 @@ public class Outlaw : Player
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.red;
+
+        taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptContainer").transform.GetChild(0).gameObject;
     }
 
     private void Update()
@@ -24,6 +27,7 @@ public class Outlaw : Player
         if (!IsOwner) return;
 
         CheckTaskCompleting();
+        CheckNearTask();
     }
 
     // Code To Handle Task Completion
@@ -37,6 +41,13 @@ public class Outlaw : Player
         if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
         StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
+    }
+
+    // Code To Handle Task Prompt Text
+    private void CheckNearTask()
+    {
+        if (!!taskInRadius && gameManager.isGamePlaying.Value) taskPromptText.SetActive(true);
+        else taskPromptText.SetActive(false);
     }
 
     // Set Task When Within Radius
