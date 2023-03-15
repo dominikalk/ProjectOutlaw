@@ -9,7 +9,7 @@ This is a multiplayer social game developed at Cardiff University as part of a G
 - Reuben Baker
 - Saud Alharbi
 - Jessica Davies
-- Contributor 6
+- Noura Alrashdi
 
 ## Git global setup
 
