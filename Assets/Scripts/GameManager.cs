@@ -40,6 +40,9 @@ public class GameManager : NetworkBehaviour
     [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
     [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
 
+    [SerializeField] private int bulletsRemaining;
+    [SerializeField] private TextMeshProUGUI bulletsRemainingText;
+
     // Pause game until "Start Game" pressed
     public void Start()
     {
@@ -95,6 +98,8 @@ public class GameManager : NetworkBehaviour
         // Set start game button active to false
         startGamePressed = true;
         startGameBtn.gameObject.SetActive(false);
+
+        bulletsRemainingText.text = $"Bullets: {bulletsRemaining}";
     }
 
     private void Update()
@@ -114,7 +119,17 @@ public class GameManager : NetworkBehaviour
             OnPlayAgainPressed();
         }
     }
+    public void DecrementBullets()
+    {
+        bulletsRemaining--;
+        bulletsRemainingText.text = $"Bullets: {bulletsRemaining}";
+        if (bulletsRemaining <= 0)
+        {
+            ShowWinLoss(GameEndEnum.BulletsGone);
+            Debug.Log("Outlaws Win - Sheriffs ran out of bullets");
+        }
 
+    }
     // Handles play again button logic
     public void OnPlayAgainPressed()
     {
