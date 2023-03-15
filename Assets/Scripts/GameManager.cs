@@ -15,6 +15,9 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<bool> isGamePlaying =
         new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
+    [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
+
     // Tasks Vars
     [SerializeField] public int noOfTasks;
     private int noTasksCompleted = 0;
@@ -37,10 +40,9 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossText;
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
-    [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
-    [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
-
-    [SerializeField] private int bulletsRemaining;
+    // Sheriff Screen Vars
+    [SerializeField] public int bulletsRemaining;
+    [SerializeField] private GameObject sheriffScreen;
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
 
     // Pause game until "Start Game" pressed
@@ -99,7 +101,7 @@ public class GameManager : NetworkBehaviour
         startGamePressed = true;
         startGameBtn.gameObject.SetActive(false);
 
-        bulletsRemainingText.text = $"Bullets: {bulletsRemaining}";
+        ChangeBulletsTextClientRpc(bulletsRemaining);
     }
 
     private void Update()
@@ -119,29 +121,38 @@ public class GameManager : NetworkBehaviour
             OnPlayAgainPressed();
         }
     }
-    public void DecrementBullets()
-    {
-        bulletsRemaining--;
-        bulletsRemainingText.text = $"Bullets: {bulletsRemaining}";
-        if (bulletsRemaining <= 0)
-        {
-            ShowWinLoss(GameEndEnum.BulletsGone);
-            Debug.Log("Outlaws Win - Sheriffs ran out of bullets");
-        }
-
-    }
-    // Handles play again button logic
-    public void OnPlayAgainPressed()
-    {
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
 
     // Contains reused code for win loss screen logic
     private void ShowWinLoss(GameEndEnum gameEndEnum)
     {
         ShowWinLossClientRpc(gameEndEnum);
         isGamePlaying.Value = false;
+    }
+
+    // Decrement bullets remaining
+    [ServerRpc(RequireOwnership = false)]
+    public void DecrementBulletsServerRpc()
+    {
+        bulletsRemaining--;
+        ChangeBulletsTextClientRpc(bulletsRemaining);
+        if (bulletsRemaining <= 0)
+        {
+            ShowWinLoss(GameEndEnum.BulletsGone);
+            Debug.Log("Outlaws Win - Sheriffs ran out of bullets");
+        }
+    }
+
+    [ClientRpc]
+    public void ChangeBulletsTextClientRpc(int bullets)
+    {
+        bulletsRemainingText.text = $"Bullets: {bullets}";
+    }
+
+    // Handles play again button logic
+    public void OnPlayAgainPressed()
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Increment number of tasks completed on server
@@ -178,6 +189,7 @@ public class GameManager : NetworkBehaviour
         {
             sheriff.HideTasksClientRpc();
             sheriff.HandlePlayerCameraClientRpc();
+            sheriff.ShowSheriffUIClientRpc();
         }
     }
 
@@ -211,6 +223,7 @@ public class GameManager : NetworkBehaviour
         }
         Time.timeScale = 0f;
         tasksScreen.SetActive(false);
+        sheriffScreen.SetActive(false);
     }
 
     // On Game Start, sync up player types on all clients

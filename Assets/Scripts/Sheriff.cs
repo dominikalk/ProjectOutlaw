@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 public class Sheriff : Player
 {
@@ -18,9 +19,10 @@ public class Sheriff : Player
     {
         if (!IsOwner) return;
 
-        if (Input.GetMouseButtonDown(0) && gameManager.isGamePlaying.Value)
+        // Temporary - code to decrement bullets, i.e. shooting
+        if (Input.GetKeyDown(KeyCode.E) && gameManager.isGamePlaying.Value)
         {
-            gameManager.DecrementBullets();
+            gameManager.DecrementBulletsServerRpc();
         }
     }
 
@@ -35,5 +37,14 @@ public class Sheriff : Player
             task.transform.GetChild(0).GetComponent<Renderer>().enabled = false;
             task.transform.GetChild(1).GetComponent<Renderer>().enabled = false;
         }
+    }
+
+    // Enables the sheriff UI only for sheriffs
+    [ClientRpc]
+    public void ShowSheriffUIClientRpc()
+    {
+        if (!IsOwner) return;
+
+        Resources.FindObjectsOfTypeAll<SheriffScreenController>().FirstOrDefault()?.gameObject.SetActive(true);
     }
 }

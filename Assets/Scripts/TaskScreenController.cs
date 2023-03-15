@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -37,7 +38,7 @@ public class TaskScreenController : MonoBehaviour
     {
         TaskController[] tempTasks = FindObjectsOfType<TaskController>();
         if (tempTasks.Length != gameManager.noOfTasks) return;
-        tasks = tempTasks;
+        tasks = tempTasks.OrderBy(x => x.taskName).ToArray();
         for (int i = 0; i < tasks.Length; i++)
         {
             CreateTaskText(tasks[i], i);
