@@ -122,6 +122,13 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    // Handles play again button logic
+    public void OnPlayAgainPressed()
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     // Contains reused code for win loss screen logic
     private void ShowWinLoss(GameEndEnum gameEndEnum)
     {
@@ -146,13 +153,6 @@ public class GameManager : NetworkBehaviour
     public void ChangeBulletsTextClientRpc(int bullets)
     {
         bulletsRemainingText.text = $"Bullets: {bullets}";
-    }
-
-    // Handles play again button logic
-    public void OnPlayAgainPressed()
-    {
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Increment number of tasks completed on server
