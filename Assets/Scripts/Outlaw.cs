@@ -7,6 +7,7 @@ using Unity.Netcode;
 public class Outlaw : Player
 {
     private TaskController taskInRadius = null;
+    private GameObject taskPromptText;
 
     protected override void Start()
     {
@@ -17,6 +18,9 @@ public class Outlaw : Player
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.red;
+
+        taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptText");
+        taskPromptText.SetActive(false);
     }
 
     private void Update()
@@ -24,6 +28,9 @@ public class Outlaw : Player
         if (!IsOwner) return;
 
         CheckTaskCompleting();
+
+        if (!!taskInRadius) taskPromptText.SetActive(true);
+        else taskPromptText.SetActive(false);
     }
 
     // Code To Handle Task Completion
