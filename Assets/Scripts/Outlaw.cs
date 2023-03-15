@@ -19,8 +19,7 @@ public class Outlaw : Player
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.red;
 
-        taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptText");
-        taskPromptText.SetActive(false);
+        taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptContainer").transform.GetChild(0).gameObject;
     }
 
     private void Update()
@@ -28,9 +27,7 @@ public class Outlaw : Player
         if (!IsOwner) return;
 
         CheckTaskCompleting();
-
-        if (!!taskInRadius) taskPromptText.SetActive(true);
-        else taskPromptText.SetActive(false);
+        CheckNearTask();
     }
 
     // Code To Handle Task Completion
@@ -44,6 +41,13 @@ public class Outlaw : Player
         if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
         StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
+    }
+
+    // Code To Handle Task Prompt Text
+    private void CheckNearTask()
+    {
+        if (!!taskInRadius && gameManager.isGamePlaying.Value) taskPromptText.SetActive(true);
+        else taskPromptText.SetActive(false);
     }
 
     // Set Task When Within Radius
