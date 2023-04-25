@@ -238,6 +238,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 10
   taskRadius: 3
+  crosshair: {fileID: 4896462942998544280, guid: d3d7698845f4e0a45992ca227ed9ce4c, type: 3}
+  mouseSpeed: 1
+  mouseRadius: 6
 --- !u!1 &5581208822179816545
 GameObject:
   m_ObjectHideFlags: 0

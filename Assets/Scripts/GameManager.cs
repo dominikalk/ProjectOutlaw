@@ -116,7 +116,7 @@ public class GameManager : NetworkBehaviour
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
 
         // TODO: Dev tool - remove later
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.L))
         {
             OnPlayAgainPressed();
         }
