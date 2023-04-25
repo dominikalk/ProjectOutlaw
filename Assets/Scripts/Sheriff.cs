@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class Sheriff : Player
 {
+
+    [SerializeField] private float mouseSpeed;
+    [SerializeField] private float mouseRadius;
+    [SerializeField] private GameObject crosshair;
+    private GameObject crosshairObject;
+    private Vector2 mousePosition;
+
     protected override void Start()
     {
         base.Start();
@@ -13,6 +21,12 @@ public class Sheriff : Player
         isSheriff = true;
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.green;
+
+        // Hide cursor and instantiate cross hair object
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        crosshairObject = Instantiate(crosshair);
+
     }
 
     private void Update()
@@ -24,6 +38,19 @@ public class Sheriff : Player
         {
             gameManager.DecrementBulletsServerRpc();
         }
+
+        HandleCursorUpdate();
+    }
+
+    // Handles logic relating to moving the cursor/ cross hair
+    private void HandleCursorUpdate()
+    {
+        Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSpeed;
+
+        mousePosition += mouseDelta;
+        mousePosition = Vector2.ClampMagnitude(mousePosition, mouseRadius);
+
+        crosshairObject.transform.position = new Vector3(mousePosition.x + transform.position.x, mousePosition.y + transform.position.y, -2);
     }
 
     // Hides tasks for the Sheriffs
