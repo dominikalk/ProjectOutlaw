@@ -11,7 +11,7 @@ public class Sheriff : Player
     [SerializeField] private float mouseSpeed;
     [SerializeField] private float mouseRadius;
     [SerializeField] private GameObject crosshair;
-    private GameObject crosshairObject;
+    private Crosshair crosshairObject;
     private Vector2 mousePosition;
 
     protected override void Start()
@@ -25,7 +25,7 @@ public class Sheriff : Player
         // Hide cursor and instantiate cross hair object
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        crosshairObject = Instantiate(crosshair);
+        InstantiateCrosshairClientRpc();
 
     }
 
@@ -33,13 +33,19 @@ public class Sheriff : Player
     {
         if (!IsOwner) return;
 
-        // Temporary - code to decrement bullets, i.e. shooting
-        if (Input.GetKeyDown(KeyCode.E) && gameManager.isGamePlaying.Value)
+        if (Input.GetMouseButtonDown(0) && crosshairObject.outlawsInCrosshair.Count > 0 && gameManager.isGamePlaying.Value)
         {
+            foreach (Outlaw outlaw in crosshairObject.outlawsInCrosshair.ToArray())
+            {
+                outlaw.KillOutlawServerRpc();
+            }
             gameManager.DecrementBulletsServerRpc();
         }
 
-        HandleCursorUpdate();
+        if (gameManager.isGamePlaying.Value)
+        {
+            HandleCursorUpdate();
+        }
     }
 
     // Handles logic relating to moving the cursor/ cross hair
@@ -51,6 +57,15 @@ public class Sheriff : Player
         mousePosition = Vector2.ClampMagnitude(mousePosition, mouseRadius);
 
         crosshairObject.transform.position = new Vector3(mousePosition.x + transform.position.x, mousePosition.y + transform.position.y, -2);
+    }
+
+    // Instantiates crosshair only on specific sheriff client
+    [ClientRpc]
+    private void InstantiateCrosshairClientRpc()
+    {
+        if (!IsOwner) return;
+
+        crosshairObject = Instantiate(crosshair).GetComponent<Crosshair>();
     }
 
     // Hides tasks for the Sheriffs

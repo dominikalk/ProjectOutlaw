@@ -43,8 +43,9 @@ public class Player : NetworkBehaviour
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
     }
 
-    [ServerRpc]
-    private void MovePlayerServerRpc(Vector3 deltaPos)
+    // TODO: make protected private and make requires ownership true
+    [ServerRpc(RequireOwnership = false)]
+    protected void MovePlayerServerRpc(Vector3 deltaPos)
     {
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
@@ -67,7 +68,7 @@ public class Player : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        Camera.main.gameObject.SetActive(false); 
+        Camera.main.gameObject.SetActive(false);
         transform.GetChild(0).gameObject.SetActive(true);
     }
 }
