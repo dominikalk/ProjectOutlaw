@@ -8,9 +8,9 @@ using Unity.VisualScripting;
 public class Sheriff : Player
 {
 
-    [SerializeField] private GameObject crosshair;
     [SerializeField] private float mouseSpeed;
     [SerializeField] private float mouseRadius;
+    [SerializeField] private GameObject crosshair;
     private GameObject crosshairObject;
     private Vector2 mousePosition;
 
@@ -22,11 +22,11 @@ public class Sheriff : Player
         // TODO: replace with change in sprite
         GetComponent<SpriteRenderer>().color = Color.green;
 
-
-        Cursor.visible= false;
-        Cursor.lockState= CursorLockMode.Locked;
+        // Hide cursor and instantiate cross hair object
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         crosshairObject = Instantiate(crosshair);
-       
+
     }
 
     private void Update()
@@ -42,6 +42,7 @@ public class Sheriff : Player
         HandleCursorUpdate();
     }
 
+    // Handles logic relating to moving the cursor/ cross hair
     private void HandleCursorUpdate()
     {
         Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSpeed;
