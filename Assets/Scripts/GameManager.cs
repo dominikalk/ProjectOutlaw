@@ -44,6 +44,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] public int bulletsRemaining;
     [SerializeField] private GameObject sheriffScreen;
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
+    [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
     // Pause game until "Start Game" pressed
     public void Start()
@@ -101,7 +102,7 @@ public class GameManager : NetworkBehaviour
         startGamePressed = true;
         startGameBtn.gameObject.SetActive(false);
 
-        ChangeBulletsTextClientRpc(bulletsRemaining);
+        ChangeSheriffScreenTextClientRpc(outlaws.Count, bulletsRemaining);
     }
 
     private void Update()
@@ -141,8 +142,17 @@ public class GameManager : NetworkBehaviour
     public void DecrementBulletsServerRpc()
     {
         bulletsRemaining--;
-        ChangeBulletsTextClientRpc(bulletsRemaining);
-        if (bulletsRemaining <= 0)
+
+        Outlaw[] outlaws = FindObjectsOfType<Outlaw>().Where(outlaw => outlaw.isActiveAndEnabled && outlaw.isAlive).ToArray();
+
+        ChangeSheriffScreenTextClientRpc(outlaws.Length, bulletsRemaining);
+
+        if (outlaws.Length == 0)
+        {
+            ShowWinLoss(GameEndEnum.OutlawsShot);
+            Debug.Log("Sheriffs Win - Sheriffs shot all the outlaws");
+        }
+        else if (bulletsRemaining <= 0)
         {
             ShowWinLoss(GameEndEnum.BulletsGone);
             Debug.Log("Outlaws Win - Sheriffs ran out of bullets");
@@ -150,9 +160,10 @@ public class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void ChangeBulletsTextClientRpc(int bullets)
+    public void ChangeSheriffScreenTextClientRpc(int outlaws, int bullets)
     {
-        bulletsRemainingText.text = $"Bullets: {bullets}";
+        outlawsRemainingText.text = $"Outlaws Remaining: {outlaws}";
+        bulletsRemainingText.text = $"Bullets Remaining: {bullets}";
     }
 
     // Increment number of tasks completed on server
@@ -224,6 +235,9 @@ public class GameManager : NetworkBehaviour
         Time.timeScale = 0f;
         tasksScreen.SetActive(false);
         sheriffScreen.SetActive(false);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     // On Game Start, sync up player types on all clients

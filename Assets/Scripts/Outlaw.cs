@@ -9,6 +9,8 @@ public class Outlaw : Player
     private TaskController taskInRadius = null;
     private GameObject taskPromptText;
 
+    public bool isAlive = true;
+
     protected override void Start()
     {
         base.Start();
@@ -20,11 +22,14 @@ public class Outlaw : Player
         GetComponent<SpriteRenderer>().color = Color.red;
 
         taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptContainer").transform.GetChild(0).gameObject;
+
+        // TODO: Remove this temp fix for outlaws
+        MovePlayerServerRpc(new Vector3(0, 2, 0));
     }
 
     private void Update()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || !isAlive) return;
 
         CheckTaskCompleting();
         CheckNearTask();
@@ -71,6 +76,20 @@ public class Outlaw : Player
         taskInRadius = null;
     }
 
+    // Shows crosshair effect for sheriff
+    public void ShowCrosshairHover()
+    {
+        // TODO: replace with glow effect
+        GetComponent<SpriteRenderer>().color = Color.yellow;
+    }
+
+    // Hides crosshair effect for sheriff
+    public void HideCrosshairHover()
+    {
+        // TODO: replace with glow effect
+        GetComponent<SpriteRenderer>().color = Color.red;
+    }
+
     // Sets value of task competion start time on server
     [ServerRpc]
     public void StartTaskServerRpc(float start, ulong taskId)
@@ -96,5 +115,35 @@ public class Outlaw : Player
         if (!IsOwner) return;
 
         Resources.FindObjectsOfTypeAll<TaskScreenController>().FirstOrDefault()?.gameObject.SetActive(true);
+    }
+
+    // Set isAlive to false on server and call client rpc
+    [ServerRpc(RequireOwnership = false)]
+    public void KillOutlawServerRpc()
+    {
+        if (!IsServer) return;
+
+        isAlive = false;
+        KillOutlawClientRpc();
+    }
+
+    // Hide "ghost" for sheriffs but make transparent for outlaws
+    [ClientRpc]
+    public void KillOutlawClientRpc()
+    {
+        bool isSheriff = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Sheriff>().enabled;
+
+        if (!isSheriff)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 0, 0, 0.4f);
+        }
+        else
+        {
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        }
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        gameObject.GetComponent<CircleCollider2D>().enabled = false;
+
+        isAlive = false;
     }
 }

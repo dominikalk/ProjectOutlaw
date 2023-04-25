@@ -1757,6 +1757,11 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4896462942998544280, guid: d3d7698845f4e0a45992ca227ed9ce4c, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -4067,7 +4072,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1145168183
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4085,7 +4090,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -10}
+  m_AnchoredPosition: {x: 0, y: -5}
   m_SizeDelta: {x: -20, y: 18}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1145168184
@@ -5218,7 +5223,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 20, y: -20}
-  m_SizeDelta: {x: 200, y: 28}
+  m_SizeDelta: {x: 200, y: 51}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1470553185
 MonoBehaviour:
@@ -5455,7 +5460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea8cc2e749f5ddb4f8ecc79f05af17b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameLength: 60
+  gameLength: 200
   isGamePlaying:
     m_InternalValue: 0
   sheriffs: []
@@ -5469,6 +5474,7 @@ MonoBehaviour:
   bulletsRemaining: 3
   sheriffScreen: {fileID: 1470553183}
   bulletsRemainingText: {fileID: 1065973720}
+  outlawsRemainingText: {fileID: 1145168184}
 --- !u!4 &1664633679
 Transform:
   m_ObjectHideFlags: 0
