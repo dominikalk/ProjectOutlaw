@@ -46,6 +46,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
     [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
+    [SerializeField] private GameObject gameCodeContainer;
+
     // Pause game until "Start Game" pressed
     public void Start()
     {
@@ -56,6 +58,8 @@ public class GameManager : NetworkBehaviour
     public void OnGameStart()
     {
         if (!IsServer) return;
+
+        gameCodeContainer.SetActive(false);
 
         // Remove tasks to leave set remaining number
         List<int> removedTasksIndexs = new List<int>();
@@ -117,7 +121,7 @@ public class GameManager : NetworkBehaviour
         if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
 
         // TODO: Dev tool - remove later
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(KeyCode.Slash))
         {
             OnPlayAgainPressed();
         }

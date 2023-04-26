@@ -1,8 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 
 public class NetworkManagerUI : NetworkBehaviour
 {
@@ -10,6 +17,9 @@ public class NetworkManagerUI : NetworkBehaviour
     [SerializeField] private Button hostOutlawButton;
     [SerializeField] private Button clientSheriffButton;
     [SerializeField] private Button clientOutlawButton;
+    [SerializeField] private TMP_InputField gameCodeInput;
+    [SerializeField] private GameObject gameCodeContainer;
+    [SerializeField] private TextMeshProUGUI gameCodeText;
 
     private GameManager gameManager;
 
@@ -17,45 +27,54 @@ public class NetworkManagerUI : NetworkBehaviour
     {
         hostSheriffButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartHost();
-            AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, true);
-            hideButtons();
+            CreateRelay();
+            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+            {
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, true);
+                hideButtons();
+            };
         });
         hostOutlawButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartHost();
-            AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, false);
-            hideButtons();
+            CreateRelay();
+            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+            {
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, false);
+                hideButtons();
+            };
         });
         clientSheriffButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartClient();
-            StartCoroutine(WaitForNetworkConnection(true));
+            JoinRelay(gameCodeInput.text);
+            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+            {
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, true);
+                hideButtons();
+            };
         });
         clientOutlawButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartClient();
-            StartCoroutine(WaitForNetworkConnection(false));
+            JoinRelay(gameCodeInput.text);
+            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+            {
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, false);
+                hideButtons();
+            };
         });
     }
 
-    private void Start()
+    private async void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
-    }
 
-    // Make sure connection is valid before checking NetworkManager
-    private IEnumerator WaitForNetworkConnection(bool isSheriff)
-    {
-        // TODO: add timeout so no infinite loop
-        while (!NetworkManager.Singleton.IsConnectedClient)
+        await UnityServices.InitializeAsync();
+        AuthenticationService.Instance.SignedIn += () =>
         {
-            yield return new WaitForEndOfFrame();
-        }
-
-        AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, isSheriff);
-        hideButtons();
+            Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
+        };
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
+
 
     // Hides all button UI
     private void hideButtons()
@@ -64,6 +83,7 @@ public class NetworkManagerUI : NetworkBehaviour
         hostOutlawButton.gameObject.SetActive(false);
         clientSheriffButton.gameObject.SetActive(false);
         clientOutlawButton.gameObject.SetActive(false);
+        gameCodeInput.gameObject.SetActive(false);
     }
 
     // Adds player gameobject to list in GameManager
@@ -73,5 +93,43 @@ public class NetworkManagerUI : NetworkBehaviour
         GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
         if (isSheriff) gameManager.sheriffs.Add(newPlayer.GetComponent<Sheriff>());
         else gameManager.outlaws.Add(newPlayer.GetComponent<Outlaw>());
+    }
+
+    private async void CreateRelay()
+    {
+        try
+        {
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(9);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            Debug.Log(joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkManager.Singleton.StartHost();
+
+            gameCodeContainer.SetActive(true);
+            gameCodeText.text = $"Game Code: {joinCode}";
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+
+    private async void JoinRelay(string joinCode)
+    {
+        try
+        {
+            Debug.Log("Joining Relay with " + joinCode);
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkManager.Singleton.StartClient();
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log(e);
+        }
     }
 }
