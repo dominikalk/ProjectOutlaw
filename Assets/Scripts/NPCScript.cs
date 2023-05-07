@@ -10,27 +10,24 @@ public class NPCScript : MonoBehaviour
     [SerializeField] public float speed;
     private System.Random r = new System.Random();
     private int timeSinceTask;
-    void Start()
-    {
-        
-    }
+
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = Vector2.MoveTowards(this.transform.position, moveNode.transform.position, speed * Time.deltaTime);
-        if(transform.position == moveNode.transform.position)
+        transform.position = Vector2.MoveTowards(transform.position, moveNode.transform.position, speed * Time.deltaTime);
+        if (transform.position == moveNode.transform.position)
         {
             if (moveNode.isTask == true)
             {
                 int wait = r.Next(0, 2);
-                if(wait == 1)
+                if (wait == 1)
                 {
                     StartCoroutine(waitOnTask());
                 }
             }
             List<NPCNode> currentAdjacentNodes = moveNode.adjacentNodes;
-            
+
             int rInt = r.Next(0, currentAdjacentNodes.Count);
             moveNode = currentAdjacentNodes[rInt];
         }
@@ -38,8 +35,8 @@ public class NPCScript : MonoBehaviour
 
     IEnumerator waitOnTask()
     {
-        
+
         yield return new WaitForSeconds(7);
-        
+
     }
 }
