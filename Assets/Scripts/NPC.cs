@@ -80,8 +80,8 @@ public class NPC : NetworkBehaviour
     }
 
     // Move NPC on server
-    [ServerRpc]
-    private void MoveNPCServerRpc(Vector3 position, ulong objectId)
+    [ServerRpc(RequireOwnership = false)]
+    public void MoveNPCServerRpc(Vector3 position, ulong objectId)
     {
         NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
 

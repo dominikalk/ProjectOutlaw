@@ -89,15 +89,29 @@ public class Player : NetworkBehaviour
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
     }
 
-    // TODO: make protected private and make requires ownership true
-    [ServerRpc(RequireOwnership = false)]
-    protected void MovePlayerServerRpc(Vector3 deltaPos)
+    // Move Player by difference
+    [ServerRpc]
+    private void MovePlayerServerRpc(Vector3 deltaPos)
     {
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
             var client = NetworkManager.ConnectedClients[OwnerClientId];
             client.PlayerObject.transform.Translate(deltaPos);
         }
+    }
+
+    // Move player by absolute 
+    [ServerRpc(RequireOwnership = false)]
+    public void SetPlayerPosServerRpc(Vector3 position, ulong objectId)
+    {
+        GameManager gameManager = FindObjectOfType<GameManager>();
+
+        Player player = gameManager.outlaws.Find(outlaw => outlaw.NetworkObjectId == objectId);
+        if (player == null) player = gameManager.sheriffs.Find(sheriff => sheriff.NetworkObjectId == objectId);
+
+        if (player == null) return;
+
+        player.gameObject.transform.SetPositionAndRotation(position, Quaternion.identity);
     }
 
     // Brings the users player to the front of all other players

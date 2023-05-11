@@ -22,9 +22,6 @@ public class Outlaw : Player
         GetComponent<SpriteRenderer>().color = Color.red;
 
         taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptContainer").transform.GetChild(0).gameObject;
-
-        // TODO: Remove this temp fix for outlaws
-        MovePlayerServerRpc(new Vector3(0, 2, 0));
     }
 
     protected override void Update()
