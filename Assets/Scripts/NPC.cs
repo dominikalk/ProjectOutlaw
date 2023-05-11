@@ -79,16 +79,7 @@ public class NPC : NetworkBehaviour
         NetworkObject.Despawn();
     }
 
-    [ClientRpc]
-    private void TestMoveNPcClientRpc(Vector3 position, ulong objectId)
-    {
-        NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
-
-        if (npc == null) return;
-
-        npc.gameObject.transform.position = position;
-    }
-
+    // Move NPC on server
     [ServerRpc]
     private void MoveNPCServerRpc(Vector3 position, ulong objectId)
     {
@@ -98,6 +89,17 @@ public class NPC : NetworkBehaviour
 
         npc.gameObject.transform.position = position;
 
-        TestMoveNPcClientRpc(position, objectId);
+        MoveNPCClientRpc(position, objectId);
+    }
+
+    // Move NPC on clients
+    [ClientRpc]
+    private void MoveNPCClientRpc(Vector3 position, ulong objectId)
+    {
+        NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
+
+        if (npc == null) return;
+
+        npc.gameObject.transform.position = position;
     }
 }
