@@ -11,6 +11,9 @@ public class Outlaw : Player
 
     public bool isAlive = true;
 
+    private ChatSystem chatSystem;
+    private bool joinedChat = false;
+
     protected override void Start()
     {
         base.Start();
@@ -25,6 +28,9 @@ public class Outlaw : Player
 
         // TODO: Remove this temp fix for outlaws
         MovePlayerServerRpc(new Vector3(0, 2, 0));
+
+        // Find the ChatSystem object in the scene
+        chatSystem = FindObjectOfType<ChatSystem>();
     }
 
     private void Update()
@@ -33,6 +39,34 @@ public class Outlaw : Player
 
         CheckTaskCompleting();
         CheckNearTask();
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            chatSystem.SendMessage("Outlaw");
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            chatSystem.chatInput.Select();
+            chatSystem.chatInput.ActivateInputField();
+            isChatInputActive = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        // Send an initial message to the chat system if it hasn't been sent before
+        if (!joinedChat)
+        {
+            chatSystem.chatInput.text = "Outlaw joined the game!";
+            chatSystem.SendMessage("Outlaw");
+            joinedChat = true;
+        }
     }
 
     // Code To Handle Task Completion

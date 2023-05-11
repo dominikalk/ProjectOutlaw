@@ -15,6 +15,8 @@ public class Player : NetworkBehaviour
     protected GameManager gameManager;
     protected bool isSheriff;
 
+    protected bool isChatInputActive = false;
+
     protected virtual void Start()
     {
         if (!IsOwner) return;
@@ -34,10 +36,12 @@ public class Player : NetworkBehaviour
     {
         Vector3 moveDir = new Vector3(0, 0, 0);
 
-        if (Input.GetKey(KeyCode.W)) moveDir.y += +1f;
-        if (Input.GetKey(KeyCode.S)) moveDir.y += -1f;
-        if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
-        if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
+        if (!isChatInputActive) {
+            if (Input.GetKey(KeyCode.W)) moveDir.y += +1f;
+            if (Input.GetKey(KeyCode.S)) moveDir.y += -1f;
+            if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
+            if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
+        }
 
         Vector3 deltaPos = moveDir.normalized * movementSpeed * Time.deltaTime;
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
