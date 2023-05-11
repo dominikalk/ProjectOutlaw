@@ -17,6 +17,7 @@ public class GameManager : NetworkBehaviour
 
     [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
     [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
+    public List<NPC> npcs = new List<NPC>();
 
     // Tasks Vars
     [SerializeField] public int noOfTasks;

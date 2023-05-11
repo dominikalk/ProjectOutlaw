@@ -31,12 +31,9 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || isChatInputActive) return;
 
-        if (!isChatInputActive)
-        {
-            CheckMovement();
-        }
+        CheckMovement();
     }
 
     protected virtual void Update()

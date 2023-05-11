@@ -34,11 +34,15 @@ public class Sheriff : Player
 
         if (!IsOwner) return;
 
-        if (Input.GetMouseButtonDown(0) && crosshairObject.outlawsInCrosshair.Count > 0 && gameManager.isGamePlaying.Value)
+        if (Input.GetMouseButtonDown(0) && (crosshairObject.outlawsInCrosshair.Count > 0 || crosshairObject.npcsInCrosshair.Count > 0) && gameManager.isGamePlaying.Value)
         {
             foreach (Outlaw outlaw in crosshairObject.outlawsInCrosshair.ToArray())
             {
                 outlaw.KillOutlawServerRpc();
+            }
+            foreach (NPC npc in crosshairObject.npcsInCrosshair.ToArray())
+            {
+                npc.KillNPCServerRpc();
             }
             gameManager.DecrementBulletsServerRpc();
         }
