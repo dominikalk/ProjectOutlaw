@@ -27,8 +27,10 @@ public class Outlaw : Player
         MovePlayerServerRpc(new Vector3(0, 2, 0));
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (!IsOwner || !isAlive) return;
 
         CheckTaskCompleting();

@@ -26,11 +26,12 @@ public class Sheriff : Player
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         InstantiateCrosshairClientRpc();
-
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (!IsOwner) return;
 
         if (Input.GetMouseButtonDown(0) && crosshairObject.outlawsInCrosshair.Count > 0 && gameManager.isGamePlaying.Value)

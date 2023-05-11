@@ -15,18 +15,67 @@ public class Player : NetworkBehaviour
     protected GameManager gameManager;
     protected bool isSheriff;
 
+    protected bool isChatInputActive = false;
+    protected ChatSystem chatSystem;
+    protected bool joinedChat = false;
+
     protected virtual void Start()
     {
         if (!IsOwner) return;
 
         gameManager = FindObjectOfType<GameManager>();
+
+        // Find the ChatSystem object in the scene
+        chatSystem = FindObjectOfType<ChatSystem>();
     }
 
     private void FixedUpdate()
     {
         if (!IsOwner) return;
 
-        CheckMovement();
+        if (!isChatInputActive)
+        {
+            CheckMovement();
+        }
+    }
+
+    protected virtual void Update()
+    {
+        if (!IsOwner) return;
+
+        CheckPlayerMessaging();
+    }
+
+    private void CheckPlayerMessaging()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            chatSystem.SendMessage(isSheriff ? "Sheriff" : "Outlaw");
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            chatSystem.chatInput.Select();
+            chatSystem.chatInput.ActivateInputField();
+            isChatInputActive = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        // Send an initial message to the chat system if it hasn't been sent before
+        if (!joinedChat)
+        {
+            string roleText = isSheriff ? "Sheriff" : "Outlaw";
+            chatSystem.chatInput.text = $"{roleText} joined the game!";
+            chatSystem.SendMessage(isSheriff ? "Sheriff" : "Outlaw");
+            joinedChat = true;
+        }
     }
 
     // Code To Handle Player Movement
