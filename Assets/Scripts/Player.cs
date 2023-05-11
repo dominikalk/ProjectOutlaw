@@ -16,19 +16,66 @@ public class Player : NetworkBehaviour
     protected bool isSheriff;
 
     protected bool isChatInputActive = false;
+    protected ChatSystem chatSystem;
+    protected bool joinedChat = false;
 
     protected virtual void Start()
     {
         if (!IsOwner) return;
 
         gameManager = FindObjectOfType<GameManager>();
+
+        // Find the ChatSystem object in the scene
+        chatSystem = FindObjectOfType<ChatSystem>();
     }
 
     private void FixedUpdate()
     {
         if (!IsOwner) return;
 
-        CheckMovement();
+        if (!isChatInputActive)
+        {
+            CheckMovement();
+        }
+    }
+
+    protected virtual void Update()
+    {
+        if (!IsOwner) return;
+
+        CheckPlayerMessaging();
+    }
+
+    private void CheckPlayerMessaging()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            chatSystem.SendMessage(isSheriff ? "Sheriff" : "Outlaw");
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            chatSystem.chatInput.Select();
+            chatSystem.chatInput.ActivateInputField();
+            isChatInputActive = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            chatSystem.chatInput.DeactivateInputField();
+            isChatInputActive = false;
+        }
+
+        // Send an initial message to the chat system if it hasn't been sent before
+        if (!joinedChat)
+        {
+            string roleText = isSheriff ? "Sheriff" : "Outlaw";
+            chatSystem.chatInput.text = $"{roleText} joined the game!";
+            chatSystem.SendMessage(isSheriff ? "Sheriff" : "Outlaw");
+            joinedChat = true;
+        }
     }
 
     // Code To Handle Player Movement
@@ -36,12 +83,10 @@ public class Player : NetworkBehaviour
     {
         Vector3 moveDir = new Vector3(0, 0, 0);
 
-        if (!isChatInputActive) {
-            if (Input.GetKey(KeyCode.W)) moveDir.y += +1f;
-            if (Input.GetKey(KeyCode.S)) moveDir.y += -1f;
-            if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
-            if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
-        }
+        if (Input.GetKey(KeyCode.W)) moveDir.y += +1f;
+        if (Input.GetKey(KeyCode.S)) moveDir.y += -1f;
+        if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
+        if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
 
         Vector3 deltaPos = moveDir.normalized * movementSpeed * Time.deltaTime;
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);

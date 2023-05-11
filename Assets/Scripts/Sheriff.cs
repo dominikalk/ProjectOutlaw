@@ -14,9 +14,6 @@ public class Sheriff : Player
     private Crosshair crosshairObject;
     private Vector2 mousePosition;
 
-    private ChatSystem chatSystem;
-    private bool joinedChat = false;
-
     protected override void Start()
     {
         base.Start();
@@ -29,13 +26,12 @@ public class Sheriff : Player
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         InstantiateCrosshairClientRpc();
-
-        // Find the ChatSystem object in the scene
-        chatSystem = FindObjectOfType<ChatSystem>();
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (!IsOwner) return;
 
         if (Input.GetMouseButtonDown(0) && crosshairObject.outlawsInCrosshair.Count > 0 && gameManager.isGamePlaying.Value)
@@ -50,34 +46,6 @@ public class Sheriff : Player
         if (gameManager.isGamePlaying.Value)
         {
             HandleCursorUpdate();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            chatSystem.SendMessage("Sheriff");
-            chatSystem.chatInput.DeactivateInputField();
-            isChatInputActive = false;
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            chatSystem.chatInput.Select();
-            chatSystem.chatInput.ActivateInputField();
-            isChatInputActive = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            chatSystem.chatInput.DeactivateInputField();
-            isChatInputActive = false;
-        }
-
-        // Send an initial message to the chat system if it hasn't been sent before
-        if (!joinedChat)
-        {
-            chatSystem.chatInput.text = "Sheriff joined the game!";
-            chatSystem.SendMessage("Sheriff");
-            joinedChat = true;
         }
     }
 
