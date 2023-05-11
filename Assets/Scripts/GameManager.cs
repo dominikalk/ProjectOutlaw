@@ -93,9 +93,31 @@ public class GameManager : NetworkBehaviour
         // Ensure each player sees their character in the front
         Player[] sheriffPlayers = FindObjectsOfType<Sheriff>();
         Player[] outlawPlayers = FindObjectsOfType<Outlaw>();
-        foreach (Player player in sheriffPlayers.Concat(outlawPlayers))
+        Player[] players = sheriffPlayers.Concat(outlawPlayers).ToArray();
+        foreach (Player player in players)
         {
             player.PullZPosFrontClientRpc();
+        }
+
+        // Spawn NPCs and Move Players
+        List<NPCNode> npcNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
+        int v = 0;
+        System.Random rnd = new System.Random();
+        foreach (Player player in players)
+        {
+            int rand = rnd.Next(0, players.Count() - v);
+            player.SetPlayerPosServerRpc(npcNodes[rand].transform.position, player.NetworkObjectId);
+            npcNodes.RemoveAt(rand);
+            v++;
+        }
+        v = 0;
+        foreach (NPC npc in npcs)
+        {
+            int rand = rnd.Next(0, npcs.Count() - v);
+            npc.MoveNPCServerRpc(npcNodes[rand].transform.position, npc.NetworkObjectId);
+            npc.moveNode = npcNodes[rand];
+            npcNodes.RemoveAt(rand);
+            v++;
         }
 
         // Start game time
