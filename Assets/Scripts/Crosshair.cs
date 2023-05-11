@@ -7,26 +7,44 @@ using UnityEngine;
 public class Crosshair : NetworkBehaviour
 {
     public List<Outlaw> outlawsInCrosshair = new List<Outlaw>();
+    public List<NPC> npcsInCrosshair = new List<NPC>();
 
-    // Add outlaw to list and add hover effect
+    // Add outlaw/ npc to list and add hover effect
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Outlaw outlaw = collision.gameObject.GetComponent<Outlaw>();
+        NPC npc = collision.gameObject.GetComponent<NPC>();
 
-        if (outlaw == null || !outlaw.isActiveAndEnabled || outlawsInCrosshair.Contains(outlaw)) return;
+        if (outlaw != null && outlaw.isActiveAndEnabled && !outlawsInCrosshair.Contains(outlaw))
+        {
+            outlawsInCrosshair.Add(outlaw);
+            outlaw.ShowCrosshairHover();
+        };
 
-        outlawsInCrosshair.Add(outlaw);
-        outlaw.ShowCrosshairHover();
+        if (npc != null && !npcsInCrosshair.Contains(npc))
+        {
+            npcsInCrosshair.Add(npc);
+            npc.ShowCrosshairHover();
+        }
+
     }
 
-    // Remove outlaw from list and add hover effect
+    // Remove outlaw/ npc from list and add hover effect
     private void OnTriggerExit2D(Collider2D collision)
     {
         Outlaw outlaw = collision.gameObject.GetComponent<Outlaw>();
+        NPC npc = collision.gameObject.GetComponent<NPC>();
 
-        if (outlaw == null || !outlaw.isActiveAndEnabled || !outlawsInCrosshair.Contains(outlaw)) return;
+        if (outlaw != null && outlaw.isActiveAndEnabled && outlawsInCrosshair.Contains(outlaw))
+        {
+            outlawsInCrosshair.Remove(outlaw);
+            outlaw.HideCrosshairHover();
+        };
 
-        outlawsInCrosshair.Remove(outlaw);
-        outlaw.HideCrosshairHover();
+        if (npc != null && npcsInCrosshair.Contains(npc))
+        {
+            npcsInCrosshair.Remove(npc);
+            npc.HideCrosshairHover();
+        }
     }
 }
