@@ -43,6 +43,7 @@ public class NetworkManagerUI : NetworkBehaviour
             NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
             {
                 AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
+                playerNoText.text = "Players In Lobby: 1/6";
                 lobbyContainer.SetActive(true);
                 loading.SetActive(false);
             };
@@ -55,6 +56,10 @@ public class NetworkManagerUI : NetworkBehaviour
                 AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
                 lobbyContainer.SetActive(true);
                 loading.SetActive(false);
+                RectTransform rect = GetComponent<RectTransform>();
+                rect.localScale = Vector3.one;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
             };
         });
     }
@@ -68,19 +73,11 @@ public class NetworkManagerUI : NetworkBehaviour
         {
             loading.SetActive(false);
             inputsContainer.SetActive(true);
+
             Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
         };
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
-
-    // Adds player gameobject to list in GameManager Dev Mode
-    //[ServerRpc(RequireOwnership = false)]
-    //private void AddGameManagerPlayerDevServerRpc(ulong clientId, bool isSheriff)
-    //{
-    //    GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
-    //    if (isSheriff) gameManager.sheriffs.Add(newPlayer.GetComponent<Sheriff>());
-    //    else gameManager.outlaws.Add(newPlayer.GetComponent<Outlaw>());
-    //}
 
     // Adds player gameobject to list in GameManager
     [ServerRpc(RequireOwnership = false)]
@@ -89,6 +86,16 @@ public class NetworkManagerUI : NetworkBehaviour
         GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
         gameManager.playerObjects.Add(newPlayer);
         playerNoText.text = $"Players In Lobby: {gameManager.playerObjects.Count}/6";
+
+        if (gameManager.playerObjects.Count > 1) startGameButton.interactable = true;
+
+        SetNoPlayersClientRpc(gameManager.playerObjects.Count);
+    }
+
+    [ClientRpc]
+    private void SetNoPlayersClientRpc(int noPlayers)
+    {
+        playerNoText.text = $"Players In Lobby: {noPlayers}/6";
     }
 
     private async void CreateRelay()
@@ -141,6 +148,18 @@ public class NetworkManagerUI : NetworkBehaviour
             loading.SetActive(false);
             errorText.SetActive(true);
             Debug.Log(e);
+        }
+    }
+
+    public void OnJoinInputValueChanged()
+    {
+        if (gameCodeInput.text.Length == 6)
+        {
+            clientButton.interactable = true;
+        }
+        else
+        {
+            clientButton.interactable = false;
         }
     }
 }

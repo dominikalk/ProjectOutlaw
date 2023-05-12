@@ -14,11 +14,14 @@ class PlayerRatio
     public int outlaws { get; private set; }
     public int npcs { get; private set; }
 
-    public PlayerRatio(int sheriffs, int outlaws, int npcs)
+    public int bullets { get; private set; }
+
+    public PlayerRatio(int sheriffs, int outlaws, int npcs, int bullets)
     {
         this.sheriffs = sheriffs;
         this.outlaws = outlaws;
         this.npcs = npcs;
+        this.bullets = bullets;
     }
 }
 
@@ -40,8 +43,6 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject tasksScreen;
 
     // Start Game Vars
-    //[SerializeField] private Button startGameBtn;
-    //private bool startGamePressed = false;
     [SerializeField] private GameObject startGameUI;
 
     // Win Loss Objects
@@ -58,21 +59,19 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
     // Sheriff Screen Vars
-    [SerializeField] public int bulletsRemaining;
+    [HideInInspector] public int bulletsRemaining;
     [SerializeField] private GameObject sheriffScreen;
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
     [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
-    //[SerializeField] private GameObject gameCodeContainer;
-
     [SerializeField] private NPC npcObject;
 
     private Dictionary<int, PlayerRatio> playerRatios = new Dictionary<int, PlayerRatio> {
-        { 2, new PlayerRatio(1, 1, 3) },
-        { 3, new PlayerRatio(1, 2, 4) },
-        { 4, new PlayerRatio(1, 3, 6) },
-        { 5, new PlayerRatio(2, 3, 7) },
-        { 6, new PlayerRatio(2, 4, 8) },
+        { 2, new PlayerRatio(1, 1, 3, 2) },
+        { 3, new PlayerRatio(1, 2, 4, 3) },
+        { 4, new PlayerRatio(1, 3, 6, 4) },
+        { 5, new PlayerRatio(2, 3, 7, 5) },
+        { 6, new PlayerRatio(2, 4, 8, 6) },
     };
 
     // Pause game until "Start Game" pressed
@@ -85,8 +84,6 @@ public class GameManager : NetworkBehaviour
     public void OnGameStart()
     {
         if (!IsServer) return;
-
-        //gameCodeContainer.SetActive(false);
 
         System.Random rnd = new System.Random();
 
@@ -107,6 +104,7 @@ public class GameManager : NetworkBehaviour
 
         // Assign player types
         int noPlayers = playerObjects.Count();
+        bulletsRemaining = playerRatios[noPlayers].bullets;
         for (int i = 0; i < playerRatios[noPlayers].sheriffs; i++)
         {
             int rand = rnd.Next(0, playerObjects.Count);
@@ -175,11 +173,6 @@ public class GameManager : NetworkBehaviour
         gameStartTime = (float)NetworkManager.Singleton.LocalTime.Time;
         StartGameClientRpc();
 
-        // Set start game button active to false
-        //startGamePressed = true;
-        //startGameBtn.gameObject.SetActive(false);
-        startGameUI.SetActive(false);
-
         StartCoroutine("StartGame");
     }
 
@@ -198,14 +191,6 @@ public class GameManager : NetworkBehaviour
             ShowWinLoss(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
-
-        //if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
-
-        //// TODO: Dev tool - remove later
-        //if (Input.GetKeyDown(KeyCode.Slash))
-        //{
-        //    OnPlayAgainPressed();
-        //}
     }
 
     // Handles play again button logic
