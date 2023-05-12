@@ -164,7 +164,6 @@ public class GameManager : NetworkBehaviour
         {
             int rand = rnd.Next(0, npcs.Count() - v);
             npc.MoveNPCServerRpc(npcSpawnNodes[rand].transform.position, npc.NetworkObjectId, npcSpawnNodes[rand].NetworkObjectId);
-            //npc.moveNode = npcSpawnNodes[rand];
             npcSpawnNodes.RemoveAt(rand);
             v++;
         }
@@ -173,7 +172,6 @@ public class GameManager : NetworkBehaviour
 
         // Start game time
         gameStartTime = (float)NetworkManager.Singleton.LocalTime.Time;
-        //isGamePlaying.Value = true;
         StartGameClientRpc();
 
         // Set start game button active to false
