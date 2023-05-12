@@ -40,8 +40,9 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject tasksScreen;
 
     // Start Game Vars
-    [SerializeField] private Button startGameBtn;
-    private bool startGamePressed = false;
+    //[SerializeField] private Button startGameBtn;
+    //private bool startGamePressed = false;
+    [SerializeField] private GameObject startGameUI;
 
     // Win Loss Objects
     private enum GameEndEnum
@@ -62,7 +63,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
     [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
-    [SerializeField] private GameObject gameCodeContainer;
+    //[SerializeField] private GameObject gameCodeContainer;
 
     [SerializeField] private NPC npcObject;
 
@@ -85,7 +86,7 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        gameCodeContainer.SetActive(false);
+        //gameCodeContainer.SetActive(false);
 
         System.Random rnd = new System.Random();
 
@@ -175,8 +176,9 @@ public class GameManager : NetworkBehaviour
         StartGameClientRpc();
 
         // Set start game button active to false
-        startGamePressed = true;
-        startGameBtn.gameObject.SetActive(false);
+        //startGamePressed = true;
+        //startGameBtn.gameObject.SetActive(false);
+        startGameUI.SetActive(false);
 
         StartCoroutine("StartGame");
     }
@@ -197,13 +199,13 @@ public class GameManager : NetworkBehaviour
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
 
-        if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
+        //if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
 
-        // TODO: Dev tool - remove later
-        if (Input.GetKeyDown(KeyCode.Slash))
-        {
-            OnPlayAgainPressed();
-        }
+        //// TODO: Dev tool - remove later
+        //if (Input.GetKeyDown(KeyCode.Slash))
+        //{
+        //    OnPlayAgainPressed();
+        //}
     }
 
     // Handles play again button logic
@@ -276,11 +278,13 @@ public class GameManager : NetworkBehaviour
         Time.timeScale = 1f;
         foreach (Outlaw outlaw in outlaws)
         {
+            outlaw.HideStartMenuClientRpc();
             outlaw.ShowTaskUIClientRpc();
             outlaw.HandlePlayerCameraClientRpc();
         }
         foreach (Sheriff sheriff in sheriffs)
         {
+            sheriff.HideStartMenuClientRpc();
             sheriff.HideTasksClientRpc();
             sheriff.HandlePlayerCameraClientRpc();
             sheriff.ShowSheriffUIClientRpc();
