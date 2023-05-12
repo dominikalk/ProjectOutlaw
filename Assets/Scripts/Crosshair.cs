@@ -9,9 +9,18 @@ public class Crosshair : NetworkBehaviour
     public List<Outlaw> outlawsInCrosshair = new List<Outlaw>();
     public List<NPC> npcsInCrosshair = new List<NPC>();
 
+    private GameManager gameManger;
+
+    private void Start()
+    {
+        gameManger = FindObjectOfType<GameManager>();
+    }
+
     // Add outlaw/ npc to list and add hover effect
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!gameManger.isGamePlaying.Value) return;
+
         Outlaw outlaw = collision.gameObject.GetComponent<Outlaw>();
         NPC npc = collision.gameObject.GetComponent<NPC>();
 
@@ -32,6 +41,8 @@ public class Crosshair : NetworkBehaviour
     // Remove outlaw/ npc from list and add hover effect
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (!gameManger.isGamePlaying.Value) return;
+
         Outlaw outlaw = collision.gameObject.GetComponent<Outlaw>();
         NPC npc = collision.gameObject.GetComponent<NPC>();
 

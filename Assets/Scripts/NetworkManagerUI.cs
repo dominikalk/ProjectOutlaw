@@ -25,21 +25,14 @@ public class NetworkManagerUI : NetworkBehaviour
 
     private void Awake()
     {
+        // Live Mode Functions
+        // TODO: replace with new buttons
         hostSheriffButton.onClick.AddListener(() =>
         {
             CreateRelay();
             NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
             {
-                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, true);
-                hideButtons();
-            };
-        });
-        hostOutlawButton.onClick.AddListener(() =>
-        {
-            CreateRelay();
-            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
-            {
-                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, false);
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
                 hideButtons();
             };
         });
@@ -48,19 +41,48 @@ public class NetworkManagerUI : NetworkBehaviour
             JoinRelay(gameCodeInput.text);
             NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
             {
-                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, true);
+                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
                 hideButtons();
             };
         });
-        clientOutlawButton.onClick.AddListener(() =>
-        {
-            JoinRelay(gameCodeInput.text);
-            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
-            {
-                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId, false);
-                hideButtons();
-            };
-        });
+
+        // Dev Mode Functions
+        //hostSheriffButton.onClick.AddListener(() =>
+        //{
+        //    CreateRelay();
+        //    NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+        //    {
+        //        AddGameManagerPlayerDevServerRpc(NetworkManager.Singleton.LocalClientId, true);
+        //        hideButtons();
+        //    };
+        //});
+        //hostOutlawButton.onClick.AddListener(() =>
+        //{
+        //    CreateRelay();
+        //    NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+        //    {
+        //        AddGameManagerPlayerDevServerRpc(NetworkManager.Singleton.LocalClientId, false);
+        //        hideButtons();
+        //    };
+        //});
+        //clientSheriffButton.onClick.AddListener(() =>
+        //{
+        //    JoinRelay(gameCodeInput.text);
+        //    NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+        //    {
+        //        AddGameManagerPlayerDevServerRpc(NetworkManager.Singleton.LocalClientId, true);
+        //        hideButtons();
+        //    };
+        //});
+        //clientOutlawButton.onClick.AddListener(() =>
+        //{
+        //    JoinRelay(gameCodeInput.text);
+        //    NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+        //    {
+        //        AddGameManagerPlayerDevServerRpc(NetworkManager.Singleton.LocalClientId, false);
+        //        hideButtons();
+        //    };
+        //});
     }
 
     private async void Start()
@@ -86,13 +108,21 @@ public class NetworkManagerUI : NetworkBehaviour
         gameCodeInput.gameObject.SetActive(false);
     }
 
-    // Adds player gameobject to list in GameManager
+    // Adds player gameobject to list in GameManager Dev Mode
     [ServerRpc(RequireOwnership = false)]
-    private void AddGameManagerPlayerServerRpc(ulong clientId, bool isSheriff)
+    private void AddGameManagerPlayerDevServerRpc(ulong clientId, bool isSheriff)
     {
         GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
         if (isSheriff) gameManager.sheriffs.Add(newPlayer.GetComponent<Sheriff>());
         else gameManager.outlaws.Add(newPlayer.GetComponent<Outlaw>());
+    }
+
+    // Adds player gameobject to list in GameManager
+    [ServerRpc(RequireOwnership = false)]
+    private void AddGameManagerPlayerServerRpc(ulong clientId)
+    {
+        GameObject newPlayer = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
+        gameManager.playerObjects.Add(newPlayer);
     }
 
     private async void CreateRelay()
