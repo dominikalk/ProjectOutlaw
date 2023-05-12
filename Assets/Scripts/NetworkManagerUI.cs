@@ -13,10 +13,6 @@ using Unity.Networking.Transport.Relay;
 
 public class NetworkManagerUI : NetworkBehaviour
 {
-    //[SerializeField] private Button hostSheriffButton;
-    //[SerializeField] private Button hostOutlawButton;
-    //[SerializeField] private Button clientSheriffButton;
-    //[SerializeField] private Button clientOutlawButton;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
 
@@ -92,6 +88,7 @@ public class NetworkManagerUI : NetworkBehaviour
         SetNoPlayersClientRpc(gameManager.playerObjects.Count);
     }
 
+    // Set player lobby number in all clients
     [ClientRpc]
     private void SetNoPlayersClientRpc(int noPlayers)
     {
@@ -151,6 +148,7 @@ public class NetworkManagerUI : NetworkBehaviour
         }
     }
 
+    // Enable and disable join button if input has/ doesn't have correct number of chars
     public void OnJoinInputValueChanged()
     {
         if (gameCodeInput.text.Length == 6)
