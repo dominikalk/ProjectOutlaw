@@ -17,7 +17,6 @@ public class NPC : NetworkBehaviour
     private void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
-        //GetComponent<SpriteRenderer>().color = Color.gray;
     }
 
 
@@ -49,14 +48,12 @@ public class NPC : NetworkBehaviour
     // Shows crosshair effect for sheriff
     public void ShowCrosshairHover()
     {
-        // TODO: replace with glow effect
         GetComponent<SpriteRenderer>().color = Color.red;
     }
 
     // Hides crosshair effect for sheriff
     public void HideCrosshairHover()
     {
-        // TODO: replace with glow effect
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 
