@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Threading;
 using Unity.Netcode;
+using System.Linq;
 
 public class NPC : NetworkBehaviour
 {
@@ -23,7 +24,7 @@ public class NPC : NetworkBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!IsServer || !gameManager.isGamePlaying.Value) return;
+        if (!gameManager.isGamePlaying.Value) return;
 
         HandleNPCMovement();
     }
@@ -31,29 +32,18 @@ public class NPC : NetworkBehaviour
     private void HandleNPCMovement()
     {
         Vector2 position = Vector3.MoveTowards(transform.position, moveNode.transform.position, speed * Time.deltaTime);
-        MoveNPCServerRpc(position, NetworkObjectId);
+        transform.position = position;
+
+        if (!IsServer) return;
+
         if (Vector3.Distance(transform.position, moveNode.transform.position) < 0.2f)
         {
-            if (moveNode.isTask == true)
-            {
-                int wait = r.Next(0, 2);
-                if (wait == 1)
-                {
-                    StartCoroutine(waitOnTask());
-                }
-            }
             List<NPCNode> currentAdjacentNodes = moveNode.adjacentNodes;
 
-            int rInt = r.Next(0, currentAdjacentNodes.Count);
-            moveNode = currentAdjacentNodes[rInt];
+            int rInt = r.Next(0, currentAdjacentNodes.Count());
+
+            MoveNPCServerRpc(position, NetworkObjectId, currentAdjacentNodes[rInt].NetworkObjectId);
         }
-    }
-
-    IEnumerator waitOnTask()
-    {
-
-        yield return new WaitForSeconds(7);
-
     }
 
     // Shows crosshair effect for sheriff
@@ -81,25 +71,24 @@ public class NPC : NetworkBehaviour
 
     // Move NPC on server
     [ServerRpc(RequireOwnership = false)]
-    public void MoveNPCServerRpc(Vector3 position, ulong objectId)
+    public void MoveNPCServerRpc(Vector3 position, ulong objectId, ulong nodeId)
     {
+        if (!gameManager) gameManager = FindObjectOfType<GameManager>();
         NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
 
         if (npc == null) return;
 
         npc.gameObject.transform.position = position;
+        npc.moveNode = FindObjectsOfType<NPCNode>().Where(node => node.NetworkObjectId == nodeId).FirstOrDefault();
 
-        MoveNPCClientRpc(position, objectId);
+        MoveNPCClientRpc(position, objectId, nodeId);
     }
 
     // Move NPC on clients
     [ClientRpc]
-    private void MoveNPCClientRpc(Vector3 position, ulong objectId)
+    private void MoveNPCClientRpc(Vector3 position, ulong objectId, ulong nodeId)
     {
-        NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
-
-        if (npc == null) return;
-
-        npc.gameObject.transform.position = position;
+        transform.position = position;
+        moveNode = FindObjectsOfType<NPCNode>().Where(node => node.NetworkObjectId == nodeId).FirstOrDefault();
     }
 }

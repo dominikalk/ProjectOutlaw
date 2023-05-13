@@ -8,6 +8,23 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System;
 
+class PlayerRatio
+{
+    public int sheriffs { get; private set; }
+    public int outlaws { get; private set; }
+    public int npcs { get; private set; }
+
+    public int bullets { get; private set; }
+
+    public PlayerRatio(int sheriffs, int outlaws, int npcs, int bullets)
+    {
+        this.sheriffs = sheriffs;
+        this.outlaws = outlaws;
+        this.npcs = npcs;
+        this.bullets = bullets;
+    }
+}
+
 public class GameManager : NetworkBehaviour
 {
     [SerializeField] private float gameLength = 120f;
@@ -15,9 +32,10 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<bool> isGamePlaying =
         new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    [HideInInspector] public List<GameObject> playerObjects = new List<GameObject>();
     [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
     [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
-    public List<NPC> npcs = new List<NPC>();
+    [HideInInspector] public List<NPC> npcs = new List<NPC>();
 
     // Tasks Vars
     [SerializeField] public int noOfTasks;
@@ -25,8 +43,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private GameObject tasksScreen;
 
     // Start Game Vars
-    [SerializeField] private Button startGameBtn;
-    private bool startGamePressed = false;
+    [SerializeField] private GameObject startGameUI;
 
     // Win Loss Objects
     private enum GameEndEnum
@@ -42,12 +59,20 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI winLossDescText;
 
     // Sheriff Screen Vars
-    [SerializeField] public int bulletsRemaining;
+    [HideInInspector] public int bulletsRemaining;
     [SerializeField] private GameObject sheriffScreen;
     [SerializeField] private TextMeshProUGUI bulletsRemainingText;
     [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
-    [SerializeField] private GameObject gameCodeContainer;
+    [SerializeField] private NPC npcObject;
+
+    private Dictionary<int, PlayerRatio> playerRatios = new Dictionary<int, PlayerRatio> {
+        { 2, new PlayerRatio(1, 1, 3, 2) },
+        { 3, new PlayerRatio(1, 2, 4, 3) },
+        { 4, new PlayerRatio(1, 3, 6, 4) },
+        { 5, new PlayerRatio(2, 3, 7, 5) },
+        { 6, new PlayerRatio(2, 4, 8, 6) },
+    };
 
     // Pause game until "Start Game" pressed
     public void Start()
@@ -60,7 +85,7 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        gameCodeContainer.SetActive(false);
+        System.Random rnd = new System.Random();
 
         // Remove tasks to leave set remaining number
         List<int> removedTasksIndexs = new List<int>();
@@ -76,6 +101,30 @@ public class GameManager : NetworkBehaviour
                 break;
             }
         }
+
+        // Assign player types
+        int noPlayers = playerObjects.Count();
+        bulletsRemaining = playerRatios[noPlayers].bullets;
+        for (int i = 0; i < playerRatios[noPlayers].sheriffs; i++)
+        {
+            int rand = rnd.Next(0, playerObjects.Count);
+            sheriffs.Add(playerObjects[rand].GetComponent<Sheriff>());
+            playerObjects.RemoveAt(rand);
+        }
+        for (int i = 0; i < playerRatios[noPlayers].outlaws; i++)
+        {
+            int rand = rnd.Next(0, playerObjects.Count);
+            outlaws.Add(playerObjects[rand].GetComponent<Outlaw>());
+            playerObjects.RemoveAt(rand);
+        }
+        // Spawn NPCs
+        for (int i = 0; i < playerRatios[noPlayers].npcs; i++)
+        {
+            GameObject npc = Instantiate(npcObject.gameObject, Vector3.zero, Quaternion.identity);
+            npcs.Add(npc.GetComponent<NPC>());
+            npc.GetComponent<NetworkObject>().Spawn();
+        }
+
 
         // Sync up player types on all clients
         ulong[] sheriffIds = new ulong[sheriffs.Count];
@@ -100,36 +149,38 @@ public class GameManager : NetworkBehaviour
         }
 
         // Spawn NPCs and Move Players
-        List<NPCNode> npcNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
+        List<NPCNode> npcSpawnNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
         int v = 0;
-        System.Random rnd = new System.Random();
         foreach (Player player in players)
         {
             int rand = rnd.Next(0, players.Count() - v);
-            player.SetPlayerPosServerRpc(npcNodes[rand].transform.position, player.NetworkObjectId);
-            npcNodes.RemoveAt(rand);
+            player.SetPlayerPosServerRpc(npcSpawnNodes[rand].transform.position, player.NetworkObjectId);
+            npcSpawnNodes.RemoveAt(rand);
             v++;
         }
         v = 0;
         foreach (NPC npc in npcs)
         {
             int rand = rnd.Next(0, npcs.Count() - v);
-            npc.MoveNPCServerRpc(npcNodes[rand].transform.position, npc.NetworkObjectId);
-            npc.moveNode = npcNodes[rand];
-            npcNodes.RemoveAt(rand);
+            npc.MoveNPCServerRpc(npcSpawnNodes[rand].transform.position, npc.NetworkObjectId, npcSpawnNodes[rand].NetworkObjectId);
+            npcSpawnNodes.RemoveAt(rand);
             v++;
         }
 
+        ChangeSheriffScreenTextClientRpc(outlaws.Count, bulletsRemaining);
+
         // Start game time
         gameStartTime = (float)NetworkManager.Singleton.LocalTime.Time;
-        isGamePlaying.Value = true;
         StartGameClientRpc();
 
-        // Set start game button active to false
-        startGamePressed = true;
-        startGameBtn.gameObject.SetActive(false);
+        StartCoroutine("StartGame");
+    }
 
-        ChangeSheriffScreenTextClientRpc(outlaws.Count, bulletsRemaining);
+    private IEnumerator StartGame()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        isGamePlaying.Value = true;
     }
 
     private void Update()
@@ -139,14 +190,6 @@ public class GameManager : NetworkBehaviour
         {
             ShowWinLoss(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
-        }
-
-        if (!startGamePressed && IsHost) startGameBtn.gameObject.SetActive(true);
-
-        // TODO: Dev tool - remove later
-        if (Input.GetKeyDown(KeyCode.Slash))
-        {
-            OnPlayAgainPressed();
         }
     }
 
@@ -220,11 +263,13 @@ public class GameManager : NetworkBehaviour
         Time.timeScale = 1f;
         foreach (Outlaw outlaw in outlaws)
         {
+            outlaw.HideStartMenuClientRpc();
             outlaw.ShowTaskUIClientRpc();
             outlaw.HandlePlayerCameraClientRpc();
         }
         foreach (Sheriff sheriff in sheriffs)
         {
+            sheriff.HideStartMenuClientRpc();
             sheriff.HideTasksClientRpc();
             sheriff.HandlePlayerCameraClientRpc();
             sheriff.ShowSheriffUIClientRpc();
