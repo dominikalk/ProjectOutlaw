@@ -11,6 +11,7 @@ public class Sheriff : Player
     [SerializeField] private float mouseSpeed;
     [SerializeField] private float mouseRadius;
     [SerializeField] private GameObject crosshair;
+    [SerializeField] private Sprite sheriffSprite;
     private Crosshair crosshairObject;
     private Vector2 mousePosition;
 
@@ -20,7 +21,8 @@ public class Sheriff : Player
 
         isSheriff = true;
         // TODO: replace with change in sprite
-        GetComponent<SpriteRenderer>().color = Color.green;
+        //GetComponent<SpriteRenderer>().color = Color.green;
+        GetComponent<SpriteRenderer>().sprite = sheriffSprite;
 
         // Hide cursor and instantiate cross hair object
         Cursor.visible = false;
@@ -61,7 +63,7 @@ public class Sheriff : Player
         mousePosition += mouseDelta;
         mousePosition = Vector2.ClampMagnitude(mousePosition, mouseRadius);
 
-        crosshairObject.transform.position = new Vector3(mousePosition.x + transform.position.x, mousePosition.y + transform.position.y, -2);
+        crosshairObject.transform.position = new Vector3(mousePosition.x + transform.position.x, mousePosition.y + transform.position.y, -12f);
     }
 
     // Instantiates crosshair only on specific sheriff client

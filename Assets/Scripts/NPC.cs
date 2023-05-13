@@ -17,7 +17,7 @@ public class NPC : NetworkBehaviour
     private void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
-        GetComponent<SpriteRenderer>().color = Color.gray;
+        //GetComponent<SpriteRenderer>().color = Color.gray;
     }
 
 
@@ -50,14 +50,14 @@ public class NPC : NetworkBehaviour
     public void ShowCrosshairHover()
     {
         // TODO: replace with glow effect
-        GetComponent<SpriteRenderer>().color = Color.cyan;
+        GetComponent<SpriteRenderer>().color = Color.red;
     }
 
     // Hides crosshair effect for sheriff
     public void HideCrosshairHover()
     {
         // TODO: replace with glow effect
-        GetComponent<SpriteRenderer>().color = Color.gray;
+        GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     // Set isAlive to false on server and call client rpc
