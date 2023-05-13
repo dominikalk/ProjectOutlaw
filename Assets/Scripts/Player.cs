@@ -131,4 +131,13 @@ public class Player : NetworkBehaviour
         Camera.main.gameObject.SetActive(false);
         transform.GetChild(0).gameObject.SetActive(true);
     }
+
+    // Hide start menu ui
+    [ClientRpc]
+    public void HideStartMenuClientRpc()
+    {
+        if (!IsOwner) return;
+
+        FindObjectOfType<NetworkManagerUI>().gameObject.SetActive(false);
+    }
 }

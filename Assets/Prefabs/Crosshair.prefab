@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0770a5bace13d5742aaf6f2a48170ad0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cd707b679731d554995ee72d3f00dd5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -131,3 +131,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10f2c3dd8ab43e4cba223a3f0b77d99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  outlawsInCrosshair: []
+  npcsInCrosshair: []
