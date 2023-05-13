@@ -17,7 +17,7 @@ public class NPC : NetworkBehaviour
     private void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
-        GetComponent<SpriteRenderer>().color = Color.gray;
+        //GetComponent<SpriteRenderer>().color = Color.gray;
     }
 
 
@@ -31,12 +31,12 @@ public class NPC : NetworkBehaviour
 
     private void HandleNPCMovement()
     {
-        Vector2 position = Vector3.MoveTowards(transform.position, moveNode.transform.position, speed * Time.deltaTime);
+        Vector2 position = Vector2.MoveTowards(transform.position, moveNode.transform.position, speed * NetworkManager.Singleton.LocalTime.FixedDeltaTime);
         transform.position = position;
 
         if (!IsServer) return;
 
-        if (Vector3.Distance(transform.position, moveNode.transform.position) < 0.2f)
+        if (Vector2.Distance(transform.position, moveNode.transform.position) < 0.2f)
         {
             List<NPCNode> currentAdjacentNodes = moveNode.adjacentNodes;
 
@@ -50,14 +50,14 @@ public class NPC : NetworkBehaviour
     public void ShowCrosshairHover()
     {
         // TODO: replace with glow effect
-        GetComponent<SpriteRenderer>().color = Color.cyan;
+        GetComponent<SpriteRenderer>().color = Color.red;
     }
 
     // Hides crosshair effect for sheriff
     public void HideCrosshairHover()
     {
         // TODO: replace with glow effect
-        GetComponent<SpriteRenderer>().color = Color.gray;
+        GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     // Set isAlive to false on server and call client rpc
@@ -71,7 +71,7 @@ public class NPC : NetworkBehaviour
 
     // Move NPC on server
     [ServerRpc(RequireOwnership = false)]
-    public void MoveNPCServerRpc(Vector3 position, ulong objectId, ulong nodeId)
+    public void MoveNPCServerRpc(Vector2 position, ulong objectId, ulong nodeId)
     {
         if (!gameManager) gameManager = FindObjectOfType<GameManager>();
         NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
@@ -86,7 +86,7 @@ public class NPC : NetworkBehaviour
 
     // Move NPC on clients
     [ClientRpc]
-    private void MoveNPCClientRpc(Vector3 position, ulong objectId, ulong nodeId)
+    private void MoveNPCClientRpc(Vector2 position, ulong objectId, ulong nodeId)
     {
         transform.position = position;
         moveNode = FindObjectsOfType<NPCNode>().Where(node => node.NetworkObjectId == nodeId).FirstOrDefault();

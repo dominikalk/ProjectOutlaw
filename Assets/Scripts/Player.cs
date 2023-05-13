@@ -10,7 +10,6 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed;
-    [SerializeField] protected float taskRadius;
 
     protected GameManager gameManager;
     protected bool isSheriff;
@@ -34,6 +33,7 @@ public class Player : NetworkBehaviour
         if (!IsOwner || isChatInputActive) return;
 
         CheckMovement();
+        // Debug.Log(transform.position);
     }
 
     protected virtual void Update()
@@ -78,20 +78,20 @@ public class Player : NetworkBehaviour
     // Code To Handle Player Movement
     private void CheckMovement()
     {
-        Vector3 moveDir = new Vector3(0, 0, 0);
+        Vector2 moveDir = new Vector3(0, 0, 0);
 
         if (Input.GetKey(KeyCode.W)) moveDir.y += +1f;
         if (Input.GetKey(KeyCode.S)) moveDir.y += -1f;
         if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
         if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
 
-        Vector3 deltaPos = moveDir.normalized * movementSpeed * Time.deltaTime;
-        if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
+        Vector2 deltaPos = moveDir.normalized * movementSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+        if (deltaPos != Vector2.zero) MovePlayerServerRpc(deltaPos);
     }
 
     // Move Player by difference
     [ServerRpc]
-    private void MovePlayerServerRpc(Vector3 deltaPos)
+    private void MovePlayerServerRpc(Vector2 deltaPos)
     {
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
@@ -111,7 +111,9 @@ public class Player : NetworkBehaviour
 
         if (player == null) return;
 
-        player.gameObject.transform.SetPositionAndRotation(position, Quaternion.identity);
+        player.transform.SetPositionAndRotation(new Vector3(position.x, position.y, -5f), Quaternion.identity);
+
+        PullZPosFrontClientRpc();
     }
 
     // Brings the users player to the front of all other players
@@ -119,7 +121,7 @@ public class Player : NetworkBehaviour
     public void PullZPosFrontClientRpc()
     {
         if (!IsOwner) return;
-        transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
+        transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
     // Disables main camera and enables child camera for each client's player object

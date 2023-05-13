@@ -130,25 +130,17 @@ public class GameManager : NetworkBehaviour
         ulong[] sheriffIds = new ulong[sheriffs.Count];
         for (int i = 0; i < sheriffs.Count; i++)
         {
-            sheriffIds[i] = sheriffs[i].GetComponent<NetworkObject>().NetworkObjectId;
+            sheriffIds[i] = sheriffs[i].NetworkObjectId;
         }
         ulong[] outlawIds = new ulong[outlaws.Count];
         for (int i = 0; i < outlaws.Count; i++)
         {
-            outlawIds[i] = outlaws[i].GetComponent<NetworkObject>().NetworkObjectId;
+            outlawIds[i] = outlaws[i].NetworkObjectId;
         }
         SetPlayerTypesClientRpc(sheriffIds, outlawIds);
 
-        // Ensure each player sees their character in the front
-        Player[] sheriffPlayers = FindObjectsOfType<Sheriff>();
-        Player[] outlawPlayers = FindObjectsOfType<Outlaw>();
-        Player[] players = sheriffPlayers.Concat(outlawPlayers).ToArray();
-        foreach (Player player in players)
-        {
-            player.PullZPosFrontClientRpc();
-        }
-
         // Spawn NPCs and Move Players
+        Player[] players = sheriffs.Cast<Player>().Concat(outlaws).ToArray();
         List<NPCNode> npcSpawnNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
         int v = 0;
         foreach (Player player in players)
