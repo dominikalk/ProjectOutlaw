@@ -20,8 +20,6 @@ public class Sheriff : Player
         base.Start();
 
         isSheriff = true;
-        // TODO: replace with change in sprite
-        //GetComponent<SpriteRenderer>().color = Color.green;
         GetComponent<SpriteRenderer>().sprite = sheriffSprite;
 
         // Hide cursor and instantiate cross hair object

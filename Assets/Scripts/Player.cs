@@ -33,7 +33,6 @@ public class Player : NetworkBehaviour
         if (!IsOwner || isChatInputActive) return;
 
         CheckMovement();
-        // Debug.Log(transform.position);
     }
 
     protected virtual void Update()

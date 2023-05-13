@@ -19,8 +19,6 @@ public class Outlaw : Player
         isSheriff = false;
         // Set Radius Of Trigger When Player Spawns
         gameObject.GetComponent<CircleCollider2D>().radius = taskRadius;
-        // TODO: replace with change in sprite
-        //GetComponent<SpriteRenderer>().color = Color.red;
 
         taskPromptText = GameObject.FindGameObjectWithTag("TaskPromptContainer").transform.GetChild(0).gameObject;
     }
@@ -79,14 +77,12 @@ public class Outlaw : Player
     // Shows crosshair effect for sheriff
     public void ShowCrosshairHover()
     {
-        // TODO: replace with glow effect
         GetComponent<SpriteRenderer>().color = Color.red;
     }
 
     // Hides crosshair effect for sheriff
     public void HideCrosshairHover()
     {
-        // TODO: replace with glow effect
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 
