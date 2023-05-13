@@ -139,14 +139,10 @@ public class GameManager : NetworkBehaviour
         }
         SetPlayerTypesClientRpc(sheriffIds, outlawIds);
 
-        // Ensure each player sees their character in the front
         Player[] sheriffPlayers = FindObjectsOfType<Sheriff>();
         Player[] outlawPlayers = FindObjectsOfType<Outlaw>();
         Player[] players = sheriffPlayers.Concat(outlawPlayers).ToArray();
-        foreach (Player player in players)
-        {
-            player.PullZPosFrontClientRpc();
-        }
+
 
         // Spawn NPCs and Move Players
         List<NPCNode> npcSpawnNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
@@ -165,6 +161,12 @@ public class GameManager : NetworkBehaviour
             npc.MoveNPCServerRpc(npcSpawnNodes[rand].transform.position, npc.NetworkObjectId, npcSpawnNodes[rand].NetworkObjectId);
             npcSpawnNodes.RemoveAt(rand);
             v++;
+        }
+
+        // Ensure each player sees their character in the front
+        foreach (Player player in players)
+        {
+            player.PullZPosFrontClientRpc();
         }
 
         ChangeSheriffScreenTextClientRpc(outlaws.Count, bulletsRemaining);

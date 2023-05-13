@@ -10,7 +10,6 @@ using UnityEngine;
 public class Player : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed;
-    [SerializeField] protected float taskRadius;
 
     protected GameManager gameManager;
     protected bool isSheriff;
@@ -85,7 +84,7 @@ public class Player : NetworkBehaviour
         if (Input.GetKey(KeyCode.A)) moveDir.x += -1f;
         if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
 
-        Vector3 deltaPos = moveDir.normalized * movementSpeed * Time.deltaTime;
+        Vector3 deltaPos = moveDir.normalized * movementSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
         if (deltaPos != Vector3.zero) MovePlayerServerRpc(deltaPos);
     }
 
@@ -119,7 +118,7 @@ public class Player : NetworkBehaviour
     public void PullZPosFrontClientRpc()
     {
         if (!IsOwner) return;
-        transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
+        transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
     // Disables main camera and enables child camera for each client's player object

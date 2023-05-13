@@ -33,7 +33,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5581208821649909238}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.1626, y: 1.567, z: 0}
+  m_LocalPosition: {x: 5.1626, y: 1.567, z: -5}
   m_LocalScale: {x: 10.5033, y: 10.5033, z: 10.5033}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -131,7 +131,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -177,7 +177,7 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.001
+  PositionThreshold: 0.01
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
@@ -209,7 +209,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 3
+  m_Radius: 0.2
 --- !u!114 &2914267453504794737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,8 +222,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2291e18f9fb8b1f44b3aa8c59cba288d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 10
-  taskRadius: 3
+  movementSpeed: 5
+  taskRadius: 0.2
   isAlive: 1
 --- !u!114 &4305222584045630375
 MonoBehaviour:
@@ -237,8 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f28a5a3ba5b4824791af69ce6ae7804, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 10
-  taskRadius: 3
+  movementSpeed: 5
   mouseSpeed: 1
   mouseRadius: 6
   crosshair: {fileID: 4896462942998544280, guid: d3d7698845f4e0a45992ca227ed9ce4c, type: 3}
@@ -302,7 +301,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 12
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

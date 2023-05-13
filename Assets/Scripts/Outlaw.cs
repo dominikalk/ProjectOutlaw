@@ -6,6 +6,7 @@ using Unity.Netcode;
 
 public class Outlaw : Player
 {
+    [SerializeField] private float taskRadius;
     private TaskController taskInRadius = null;
     private GameObject taskPromptText;
 
