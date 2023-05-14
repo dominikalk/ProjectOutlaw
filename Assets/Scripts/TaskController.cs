@@ -15,11 +15,13 @@ public class TaskController : NetworkBehaviour
 
     private void Update()
     {
-        // Temp Code : Progress Bar For Task Completion
+        // TODO : Progress Bar For Task Completion
         float timePassed = timeToComplete - ((float)NetworkManager.Singleton.LocalTime.Time - completingStart.Value);
         if (timePassed > timeToComplete) timePassed = timeToComplete;
         Transform scale = gameObject.transform.GetChild(1).transform;
-        if (scale != null) scale.localScale = new Vector3(timePassed / timeToComplete, 0.2f, 1f);
+        Vector3 newScale = new Vector3(timePassed / timeToComplete, 0.5f, 1f);
+        if (newScale.x < 0) newScale = Vector3.zero;
+        if (scale != null) scale.localScale = newScale;
 
         if (!IsServer) return;
 

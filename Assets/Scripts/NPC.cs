@@ -2,17 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Threading;
 using Unity.Netcode;
 using System.Linq;
 
 public class NPC : NetworkBehaviour
 {
-    [SerializeField] public NPCNode moveNode;
     [SerializeField] public float speed;
     private System.Random r = new System.Random();
-    private int timeSinceTask;
     private GameManager gameManager;
+
+    private Vector2 nextPos = Vector2.zero;
+    private int[] angles = new int[] { 0, 45, -45, 90, -90, 135, -135, 180 };
+
+    private bool waiting;
 
     private void Start()
     {
@@ -28,21 +30,38 @@ public class NPC : NetworkBehaviour
         HandleNPCMovement();
     }
 
+    // Handles client side player movement
     private void HandleNPCMovement()
     {
-        Vector2 position = Vector2.MoveTowards(transform.position, moveNode.transform.position, speed * NetworkManager.Singleton.LocalTime.FixedDeltaTime);
-        transform.position = position;
+        Vector2 position = Vector2.MoveTowards(transform.position, nextPos, speed * NetworkManager.Singleton.LocalTime.FixedDeltaTime);
+        transform.position = new Vector3(position.x, position.y, -5f);
 
         if (!IsServer) return;
 
-        if (Vector2.Distance(transform.position, moveNode.transform.position) < 0.2f)
-        {
-            List<NPCNode> currentAdjacentNodes = moveNode.adjacentNodes;
+        if ((Vector2)transform.position == nextPos) FindNewTargetPosition();
+    }
 
-            int rInt = r.Next(0, currentAdjacentNodes.Count());
+    // Finds new location to head towards
+    private void FindNewTargetPosition(int angle = 200)
+    {
+        float dist = speed * UnityEngine.Random.Range(0f, 5f);
+        if (angle == 200) angle = angles[r.Next(8)];
 
-            MoveNPCServerRpc(position, NetworkObjectId, currentAdjacentNodes[rInt].NetworkObjectId);
-        }
+        Vector2 deltaPos = new Vector2(dist * Mathf.Cos(Mathf.Deg2Rad * angle), dist * Mathf.Sin(Mathf.Deg2Rad * angle));
+
+        if (waiting == false) StartCoroutine(WaitToMove(transform.position, (Vector2)transform.position + deltaPos, NetworkObjectId));
+    }
+
+    // Waits to move if the NPC is meant to wait
+    private IEnumerator WaitToMove(Vector2 position, Vector2 nextPos, ulong objectId)
+    {
+        waiting = true;
+        int rInt = r.Next(3);
+
+        if (rInt == 0) yield return new WaitForSeconds(UnityEngine.Random.Range(0, 5));
+
+        MoveNPCServerRpc(position, nextPos, objectId);
+        waiting = false;
     }
 
     // Shows crosshair effect for sheriff
@@ -68,24 +87,50 @@ public class NPC : NetworkBehaviour
 
     // Move NPC on server
     [ServerRpc(RequireOwnership = false)]
-    public void MoveNPCServerRpc(Vector2 position, ulong objectId, ulong nodeId)
+    public void MoveNPCServerRpc(Vector2 position, Vector2 nextPos, ulong objectId)
     {
         if (!gameManager) gameManager = FindObjectOfType<GameManager>();
         NPC npc = gameManager.npcs.Find(npc => npc.NetworkObjectId == objectId);
 
         if (npc == null) return;
 
-        npc.gameObject.transform.position = position;
-        npc.moveNode = FindObjectsOfType<NPCNode>().Where(node => node.NetworkObjectId == nodeId).FirstOrDefault();
+        npc.gameObject.transform.position = new Vector3(position.x, position.y, -5f);
+        npc.nextPos = nextPos;
 
-        MoveNPCClientRpc(position, objectId, nodeId);
+        MoveNPCClientRpc(position, nextPos);
     }
 
     // Move NPC on clients
     [ClientRpc]
-    private void MoveNPCClientRpc(Vector2 position, ulong objectId, ulong nodeId)
+    private void MoveNPCClientRpc(Vector2 position, Vector2 nextPos)
     {
-        transform.position = position;
-        moveNode = FindObjectsOfType<NPCNode>().Where(node => node.NetworkObjectId == nodeId).FirstOrDefault();
+        transform.position = new Vector3(position.x, position.y, -5f);
+        this.nextPos = nextPos;
+    }
+
+    // Logic to change direction if NPC collides with another object
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!IsServer || collision == null || collision.gameObject.CompareTag("Crosshair")) return;
+
+        Vector2 normal = collision.GetContact(0).normal;
+
+        float collisionAngle;
+        if (normal.x != 0) collisionAngle = 90 + (normal.x * -90);
+        else collisionAngle = 90 * normal.y;
+
+        Dictionary<int, int> deltaAngles = new Dictionary<int, int>();
+
+        foreach (int angle in angles)
+        {
+            deltaAngles[angle] = Mathf.Abs((int)collisionAngle - angle);
+        }
+
+        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in deltaAngles orderby entry.Value ascending select entry;
+
+        int newangle = sortedDict.ElementAt(r.Next(3)).Key;
+
+        MoveNPCServerRpc(transform.position, transform.position, NetworkObjectId);
+        FindNewTargetPosition(newangle);
     }
 }

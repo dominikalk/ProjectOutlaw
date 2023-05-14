@@ -81,8 +81,10 @@ public class Sheriff : Player
 
         foreach (TaskController task in FindObjectsOfType<TaskController>())
         {
-            task.transform.GetChild(0).GetComponent<Renderer>().enabled = false;
-            task.transform.GetChild(1).GetComponent<Renderer>().enabled = false;
+            for (int i = 0; i < 3; i++)
+            {
+                task.transform.GetChild(i).GetComponent<Renderer>().enabled = false;
+            }
         }
     }
 

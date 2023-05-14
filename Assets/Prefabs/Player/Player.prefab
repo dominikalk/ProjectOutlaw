@@ -209,7 +209,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.25
+  m_Radius: 0.35
 --- !u!114 &2914267453504794737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 5
-  taskRadius: 0.25
+  taskRadius: 0.35
   isAlive: 1
 --- !u!114 &4305222584045630375
 MonoBehaviour:
