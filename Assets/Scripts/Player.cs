@@ -120,6 +120,11 @@ public class Player : NetworkBehaviour
     public void PullZPosFrontClientRpc()
     {
         if (!IsOwner) return;
+
+        foreach (Player player in FindObjectsOfType<Player>())
+        {
+            player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -5f);
+        }
         transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 

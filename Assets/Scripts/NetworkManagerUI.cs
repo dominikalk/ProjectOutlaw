@@ -136,7 +136,7 @@ public class NetworkManagerUI : NetworkBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartClient();
 
-            gameCodeText.text = $"Game Code: {joinCode}";
+            gameCodeText.text = $"Game Code: {joinCode.ToUpper()}";
             startGameDescText.SetActive(true);
         }
         catch (RelayServiceException e)

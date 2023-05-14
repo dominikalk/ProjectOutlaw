@@ -16,12 +16,15 @@ class PlayerRatio
 
     public int bullets { get; private set; }
 
-    public PlayerRatio(int sheriffs, int outlaws, int npcs, int bullets)
+    public int tasks { get; private set; }
+
+    public PlayerRatio(int sheriffs, int outlaws, int npcs, int bullets, int tasks)
     {
         this.sheriffs = sheriffs;
         this.outlaws = outlaws;
         this.npcs = npcs;
         this.bullets = bullets;
+        this.tasks = tasks;
     }
 }
 
@@ -66,12 +69,13 @@ public class GameManager : NetworkBehaviour
 
     [SerializeField] private NPC npcObject;
 
+    // Sheriffs, Outlaws, NPCs, Bullets, Tasks
     private Dictionary<int, PlayerRatio> playerRatios = new Dictionary<int, PlayerRatio> {
-        { 2, new PlayerRatio(1, 1, 3, 2) },
-        { 3, new PlayerRatio(1, 2, 4, 3) },
-        { 4, new PlayerRatio(1, 3, 6, 4) },
-        { 5, new PlayerRatio(2, 3, 7, 5) },
-        { 6, new PlayerRatio(2, 4, 8, 6) },
+        { 2, new PlayerRatio(1, 1, 3, 2, 3) },
+        { 3, new PlayerRatio(1, 2, 4, 3, 5) },
+        { 4, new PlayerRatio(1, 3, 6, 4, 7) },
+        { 5, new PlayerRatio(2, 3, 7, 5, 7) },
+        { 6, new PlayerRatio(2, 4, 8, 6, 9) },
     };
 
     // Pause game until "Start Game" pressed
@@ -86,6 +90,9 @@ public class GameManager : NetworkBehaviour
         if (!IsServer) return;
 
         System.Random rnd = new System.Random();
+        int noPlayers = playerObjects.Count();
+
+        noOfTasks = playerRatios[noPlayers].tasks;
 
         // Remove tasks to leave set remaining number
         List<int> removedTasksIndexs = new List<int>();
@@ -103,7 +110,6 @@ public class GameManager : NetworkBehaviour
         }
 
         // Assign player types
-        int noPlayers = playerObjects.Count();
         bulletsRemaining = playerRatios[noPlayers].bullets;
         for (int i = 0; i < playerRatios[noPlayers].sheriffs; i++)
         {
@@ -139,23 +145,23 @@ public class GameManager : NetworkBehaviour
         }
         SetPlayerTypesClientRpc(sheriffIds, outlawIds);
 
-        // Spawn NPCs and Move Players
+        // Move Players and NPCs
         Player[] players = sheriffs.Cast<Player>().Concat(outlaws).ToArray();
-        List<NPCNode> npcSpawnNodes = new List<NPCNode>(FindObjectsOfType<NPCNode>());
+        List<GameObject> spawnNodes = new List<GameObject>(GameObject.FindGameObjectsWithTag("SpawnNode"));
         int v = 0;
         foreach (Player player in players)
         {
             int rand = rnd.Next(0, players.Count() - v);
-            player.SetPlayerPosServerRpc(npcSpawnNodes[rand].transform.position, player.NetworkObjectId);
-            npcSpawnNodes.RemoveAt(rand);
+            player.SetPlayerPosServerRpc(spawnNodes[rand].transform.position, player.NetworkObjectId);
+            spawnNodes.RemoveAt(rand);
             v++;
         }
         v = 0;
         foreach (NPC npc in npcs)
         {
             int rand = rnd.Next(0, npcs.Count() - v);
-            npc.MoveNPCServerRpc(npcSpawnNodes[rand].transform.position, npc.NetworkObjectId, npcSpawnNodes[rand].NetworkObjectId);
-            npcSpawnNodes.RemoveAt(rand);
+            npc.MoveNPCServerRpc(spawnNodes[rand].transform.position, Vector2.zero, npc.NetworkObjectId);
+            spawnNodes.RemoveAt(rand);
             v++;
         }
 
