@@ -11,8 +11,8 @@ public class ChatSystem : NetworkBehaviour
     [SerializeField] public TMP_InputField chatInput;
 
     private string playerRole;
-    private List<string> chatMessages = new List<string>();
-    private int maxMessages = 10;
+    private Dictionary<string, List<string>> chatMessagesByRole = new Dictionary<string, List<string>>();
+    private int maxMessagesPerRole = 10;
 
     new public void SendMessage(string role)
     {
@@ -31,15 +31,20 @@ public class ChatSystem : NetworkBehaviour
     [ClientRpc]
     private void UpdateChatWindowClientRpc(string role, string message)
     {
-        chatMessages.Add(message);
-
-        if (chatMessages.Count > maxMessages)
+        if (!chatMessagesByRole.ContainsKey(role))
         {
-            chatMessages.RemoveAt(0);
+            chatMessagesByRole[role] = new List<string>();
+        }
+
+        chatMessagesByRole[role].Add(message);
+
+        if (chatMessagesByRole[role].Count > maxMessagesPerRole)
+        {
+            chatMessagesByRole[role].RemoveAt(0);
         }
 
         // Filter messages based on player role
-        List<string> filteredMessages = chatMessages.Where(m => m.Contains($"[{playerRole}]")).ToList();
+        List<string> filteredMessages = chatMessagesByRole.ContainsKey(playerRole) ? chatMessagesByRole[playerRole] : new List<string>();
         chatText.text = string.Join("\n", filteredMessages);
     }
 
