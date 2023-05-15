@@ -35,13 +35,16 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<bool> isGamePlaying =
         new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    [HideInInspector] public List<GameObject> playerObjects = new List<GameObject>();
+    // TODO: hide in inspector
+    public List<GameObject> playerObjects = new List<GameObject>();
     [HideInInspector] public List<Sheriff> sheriffs = new List<Sheriff>();
     [HideInInspector] public List<Outlaw> outlaws = new List<Outlaw>();
     [HideInInspector] public List<NPC> npcs = new List<NPC>();
 
     // Tasks Vars
-    [SerializeField] public int noOfTasks;
+    [SerializeField]
+    public NetworkVariable<int> noOfTasks =
+        new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     private int noTasksCompleted = 0;
     [SerializeField] private GameObject tasksScreen;
 
@@ -55,7 +58,8 @@ public class GameManager : NetworkBehaviour
         TasksCompleted,
         OutlawsShot,
         BulletsGone,
-        NotEnded
+        NotEnded,
+        ClientDisconected
     };
     [SerializeField] private GameObject winLossScreen;
     [SerializeField] private TextMeshProUGUI winLossText;
@@ -69,6 +73,7 @@ public class GameManager : NetworkBehaviour
 
     [SerializeField] private NPC npcObject;
     [SerializeField] private GameObject chatWindow;
+    [SerializeField] private GameObject worldCamera;
 
     // Sheriffs, Outlaws, NPCs, Bullets, Tasks
     private Dictionary<int, PlayerRatio> playerRatios = new Dictionary<int, PlayerRatio> {
@@ -83,6 +88,23 @@ public class GameManager : NetworkBehaviour
     public void Start()
     {
         Time.timeScale = 0f;
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += (_) =>
+        {
+            startGameUI.SetActive(false);
+            chatWindow.SetActive(false);
+            worldCamera.SetActive(true);
+            worldCamera.transform.position = Camera.main.transform.position;
+            //if (worldCamera. != Camera.main) Camera.main.gameObject.SetActive(false);
+            winLossScreen.SetActive(true);
+            winLossText.text = "Disconnected";
+            winLossDescText.text = "A Client/Host has disconnected from the game.";
+            Time.timeScale = 0f;
+            tasksScreen.SetActive(false);
+            sheriffScreen.SetActive(false);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        };
     }
 
     // Called when start game is pressed
@@ -93,12 +115,12 @@ public class GameManager : NetworkBehaviour
         System.Random rnd = new System.Random();
         int noPlayers = playerObjects.Count();
 
-        noOfTasks = playerRatios[noPlayers].tasks;
+        noOfTasks.Value = playerRatios[noPlayers].tasks;
 
         // Remove tasks to leave set remaining number
         List<int> removedTasksIndexs = new List<int>();
         TaskController[] tasks = FindObjectsOfType<TaskController>();
-        for (int i = 0; i < tasks.Length - noOfTasks; i++)
+        for (int i = 0; i < tasks.Length - noOfTasks.Value; i++)
         {
             while (true)
             {
@@ -190,13 +212,26 @@ public class GameManager : NetworkBehaviour
             ShowWinLoss(GameEndEnum.TimeOut);
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
+
+        if (!isGamePlaying.Value) return;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
     // Handles play again button logic
     public void OnPlayAgainPressed()
     {
         NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Application.Quit();
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Contains reused code for win loss screen logic
@@ -240,7 +275,7 @@ public class GameManager : NetworkBehaviour
     public void IncTasksCompletedServerRpc()
     {
         noTasksCompleted++;
-        if (noTasksCompleted >= noOfTasks)
+        if (noTasksCompleted >= noOfTasks.Value)
         {
             ShowWinLoss(GameEndEnum.TasksCompleted);
             Debug.Log("Outlaws Win - Completed All Tasks");
@@ -282,6 +317,10 @@ public class GameManager : NetworkBehaviour
         bool isSheriff = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Sheriff>().enabled;
         chatWindow.SetActive(false);
 
+        worldCamera.SetActive(true);
+        worldCamera.transform.position = Camera.main.transform.position;
+        Camera.main.gameObject.SetActive(false);
+
         winLossScreen.SetActive(true);
         switch (gameEndType)
         {
@@ -300,6 +339,10 @@ public class GameManager : NetworkBehaviour
             case GameEndEnum.BulletsGone:
                 winLossText.text = isSheriff ? "You Lose" : "You Win";
                 winLossDescText.text = isSheriff ? "You Have Wasted All Of Your Bullets!" : "The Sheriffs Wasted All Of Their Bullets!";
+                break;
+            case GameEndEnum.ClientDisconected:
+                winLossText.text = "Disconnected";
+                winLossDescText.text = "A Client/Host has disconnected from the game.";
                 break;
             default:
                 break;

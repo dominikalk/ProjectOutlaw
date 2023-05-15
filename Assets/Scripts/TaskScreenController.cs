@@ -37,7 +37,7 @@ public class TaskScreenController : MonoBehaviour
     private void CreateTaskScreen()
     {
         TaskController[] tempTasks = FindObjectsOfType<TaskController>();
-        if (tempTasks.Length != gameManager.noOfTasks) return;
+        if (tempTasks.Length != gameManager.noOfTasks.Value) return;
         tasks = tempTasks.OrderBy(x => x.taskName).ToArray();
         for (int i = 0; i < tasks.Length; i++)
         {
