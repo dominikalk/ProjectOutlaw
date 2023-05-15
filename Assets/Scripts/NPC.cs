@@ -113,7 +113,16 @@ public class NPC : NetworkBehaviour
     {
         if (!IsServer || collision == null || collision.gameObject.CompareTag("Crosshair")) return;
 
-        Vector2 normal = collision.GetContact(0).normal;
+        Vector2 normal = Vector2.zero;
+
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            if (!collision.gameObject.CompareTag("Crosshair"))
+            {
+                normal = collision.GetContact(i).normal;
+                break;
+            }
+        }
 
         float collisionAngle;
         if (normal.x != 0) collisionAngle = 90 + (normal.x * -90);

@@ -39,10 +39,16 @@ public class Sheriff : Player
             foreach (Outlaw outlaw in crosshairObject.outlawsInCrosshair.ToArray())
             {
                 outlaw.KillOutlawServerRpc();
+                chatSystem.chatInput.text = $"An Outlaw has been shot!";
+                chatSystem.SendMessage("Sheriff");
+                chatSystem.chatInput.text = $"An Outlaw has been shot!";
+                chatSystem.SendMessage("Outlaw");
             }
             foreach (NPC npc in crosshairObject.npcsInCrosshair.ToArray())
             {
                 npc.KillNPCServerRpc();
+                chatSystem.chatInput.text = $"A villager has been shot!";
+                chatSystem.SendMessage("Sheriff");
             }
             gameManager.DecrementBulletsServerRpc();
         }

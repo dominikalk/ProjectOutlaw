@@ -68,6 +68,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI outlawsRemainingText;
 
     [SerializeField] private NPC npcObject;
+    [SerializeField] private GameObject chatWindow;
 
     // Sheriffs, Outlaws, NPCs, Bullets, Tasks
     private Dictionary<int, PlayerRatio> playerRatios = new Dictionary<int, PlayerRatio> {
@@ -279,6 +280,7 @@ public class GameManager : NetworkBehaviour
     private void ShowWinLossClientRpc(GameEndEnum gameEndType)
     {
         bool isSheriff = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Sheriff>().enabled;
+        chatWindow.SetActive(false);
 
         winLossScreen.SetActive(true);
         switch (gameEndType)

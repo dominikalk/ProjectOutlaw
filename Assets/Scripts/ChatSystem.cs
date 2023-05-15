@@ -12,7 +12,7 @@ public class ChatSystem : NetworkBehaviour
 
     private string playerRole;
     private Dictionary<string, List<string>> chatMessagesByRole = new Dictionary<string, List<string>>();
-    private int maxMessagesPerRole = 10;
+    private int maxMessagesPerRole = 7;
 
     new public void SendMessage(string role)
     {
@@ -20,7 +20,7 @@ public class ChatSystem : NetworkBehaviour
 
         playerRole = role;
 
-        string message = $"{System.DateTime.Now.ToString("hh:mm:ss")} [{role}] {chatInput.text}";
+        string message = $"[{System.DateTime.Now.ToString("hh:mm:ss")}] {chatInput.text}";
 
         ChatMessageServerRpc(role, message);
 

@@ -6,6 +6,7 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Player : NetworkBehaviour
 {
@@ -17,6 +18,8 @@ public class Player : NetworkBehaviour
     protected bool isChatInputActive = false;
     protected ChatSystem chatSystem;
     protected bool joinedChat = false;
+
+    private Vector2 gMoveDir = Vector2.zero;
 
     protected virtual void Start()
     {
@@ -30,6 +33,7 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (IsServer) MovePlayerServerRpc(gMoveDir);
         if (!IsOwner || isChatInputActive) return;
 
         CheckMovement();
@@ -68,8 +72,10 @@ public class Player : NetworkBehaviour
         if (!joinedChat)
         {
             string roleText = isSheriff ? "Sheriff" : "Outlaw";
-            chatSystem.chatInput.text = $"{roleText} joined the game!";
-            chatSystem.SendMessage(isSheriff ? "Sheriff" : "Outlaw");
+            chatSystem.chatInput.text = $"{roleText} joined!";
+            chatSystem.SendMessage("Sheriff");
+            chatSystem.chatInput.text = $"{roleText} joined!";
+            chatSystem.SendMessage("Outlaw");
             joinedChat = true;
         }
     }
@@ -85,17 +91,28 @@ public class Player : NetworkBehaviour
         if (Input.GetKey(KeyCode.D)) moveDir.x += +1f;
 
         Vector2 deltaPos = moveDir.normalized * movementSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-        if (deltaPos != Vector2.zero) MovePlayerServerRpc(deltaPos);
+        if (deltaPos != gMoveDir)
+        {
+            gMoveDir = deltaPos;
+            MovePlayerServerRpc(deltaPos);
+        }
     }
 
     // Move Player by difference
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void MovePlayerServerRpc(Vector2 deltaPos)
     {
+        Debug.Log("Here");
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
             var client = NetworkManager.ConnectedClients[OwnerClientId];
-            client.PlayerObject.transform.Translate(deltaPos);
+            client.PlayerObject.transform.SetPositionAndRotation(
+                new Vector3(
+                    client.PlayerObject.transform.position.x + deltaPos.x,
+                    client.PlayerObject.transform.position.y + deltaPos.y,
+                    -5f),
+                Quaternion.identity);
+            gMoveDir = deltaPos;
         }
     }
 

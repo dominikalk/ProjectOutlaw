@@ -36,7 +36,7 @@ public class Outlaw : Player
     // Code To Handle Task Completion
     private void CheckTaskCompleting()
     {
-        if (!Input.GetKey(KeyCode.E) || !gameManager.isGamePlaying.Value)
+        if (!Input.GetKey(KeyCode.E) || !gameManager.isGamePlaying.Value || isChatInputActive)
         {
             if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
             return;

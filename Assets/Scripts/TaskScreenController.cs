@@ -47,7 +47,7 @@ public class TaskScreenController : MonoBehaviour
         tasksScreen.sizeDelta =
             new Vector2(
                 tasksScreen.rect.width,
-                (tasks.Length + 1) * (taskText.GetComponent<RectTransform>().rect.height + lineSpacing) + lineSpacing
+                (tasks.Length + 1) * (taskText.GetComponent<RectTransform>().rect.height + lineSpacing) + lineSpacing + 40
             );
     }
 
@@ -57,10 +57,11 @@ public class TaskScreenController : MonoBehaviour
         TextMeshProUGUI taskLine = Instantiate(taskText, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
         taskLine.transform.SetParent(tasksScreen.transform, true);
         taskLine.text = task.taskName;
-        taskLine.color = Color.red;
+        taskLine.color = new Color32(188, 33, 33, 255);
         RectTransform taskRect = taskLine.GetComponent<RectTransform>();
-        taskRect.localPosition = new Vector3(0, -(lineSpacing * (index + 1) + (taskRect.rect.height * index)), 0);
-        taskRect.offsetMax = new Vector3(10, taskRect.offsetMax.y);
+        taskRect.localPosition = new Vector3(30, -(lineSpacing * (index + 1) + (taskRect.rect.height * index) + 20), 0);
+        taskRect.offsetMax = new Vector3(30, taskRect.offsetMax.y);
+        taskRect.localScale = Vector3.one;
         taskLines.Add(task.GetComponent<NetworkObject>().NetworkObjectId, taskLine);
     }
 
@@ -68,7 +69,7 @@ public class TaskScreenController : MonoBehaviour
     public void CompleteTask(ulong taskId)
     {
         TextMeshProUGUI taskLine = taskLines[taskId];
-        taskLine.color = Color.green;
+        taskLine.color = new Color32(30, 147, 30, 255);
         taskLine.fontStyle = FontStyles.Strikethrough;
         tasksCompleted++;
         progressText.text = $"Completed {tasksCompleted}/{tasks.Length}";
