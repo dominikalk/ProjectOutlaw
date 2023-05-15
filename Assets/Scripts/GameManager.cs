@@ -91,6 +91,7 @@ public class GameManager : NetworkBehaviour
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (_) =>
         {
+            if (winLossScreen.activeSelf) return;
             startGameUI.SetActive(false);
             chatWindow.SetActive(false);
             worldCamera.SetActive(true);
