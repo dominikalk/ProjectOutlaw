@@ -95,7 +95,6 @@ public class GameManager : NetworkBehaviour
             chatWindow.SetActive(false);
             worldCamera.SetActive(true);
             worldCamera.transform.position = Camera.main.transform.position;
-            //if (worldCamera. != Camera.main) Camera.main.gameObject.SetActive(false);
             winLossScreen.SetActive(true);
             winLossText.text = "Disconnected";
             winLossDescText.text = "A Client/Host has disconnected from the game.";
