@@ -112,7 +112,6 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        System.Random rnd = new System.Random();
         int noPlayers = playerObjects.Count();
 
         noOfTasks.Value = playerRatios[noPlayers].tasks;
@@ -136,13 +135,13 @@ public class GameManager : NetworkBehaviour
         bulletsRemaining = playerRatios[noPlayers].bullets;
         for (int i = 0; i < playerRatios[noPlayers].sheriffs; i++)
         {
-            int rand = rnd.Next(0, playerObjects.Count);
+            int rand = UnityEngine.Random.Range(0, playerObjects.Count);
             sheriffs.Add(playerObjects[rand].GetComponent<Sheriff>());
             playerObjects.RemoveAt(rand);
         }
         for (int i = 0; i < playerRatios[noPlayers].outlaws; i++)
         {
-            int rand = rnd.Next(0, playerObjects.Count);
+            int rand = UnityEngine.Random.Range(0, playerObjects.Count);
             outlaws.Add(playerObjects[rand].GetComponent<Outlaw>());
             playerObjects.RemoveAt(rand);
         }
@@ -174,7 +173,7 @@ public class GameManager : NetworkBehaviour
         int v = 0;
         foreach (Player player in players)
         {
-            int rand = rnd.Next(0, players.Count() - v);
+            int rand = UnityEngine.Random.Range(0, spawnNodes.Count() - v);
             player.SetPlayerPosServerRpc(spawnNodes[rand].transform.position, player.NetworkObjectId);
             spawnNodes.RemoveAt(rand);
             v++;
@@ -182,7 +181,7 @@ public class GameManager : NetworkBehaviour
         v = 0;
         foreach (NPC npc in npcs)
         {
-            int rand = rnd.Next(0, npcs.Count() - v);
+            int rand = UnityEngine.Random.Range(0, spawnNodes.Count() - v);
             npc.MoveNPCServerRpc(spawnNodes[rand].transform.position, Vector2.zero, npc.NetworkObjectId);
             spawnNodes.RemoveAt(rand);
             v++;
