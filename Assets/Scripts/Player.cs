@@ -102,7 +102,6 @@ public class Player : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void MovePlayerServerRpc(Vector2 deltaPos)
     {
-        Debug.Log("Here");
         if (NetworkManager.ConnectedClients.ContainsKey(OwnerClientId))
         {
             var client = NetworkManager.ConnectedClients[OwnerClientId];

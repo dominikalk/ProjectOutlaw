@@ -9,6 +9,7 @@ public class Outlaw : Player
     [SerializeField] private float taskRadius;
     private TaskController taskInRadius = null;
     private GameObject taskPromptText;
+    private bool completingTask = false;
 
     public bool isAlive = true;
 
@@ -38,11 +39,16 @@ public class Outlaw : Player
     {
         if (!Input.GetKey(KeyCode.E) || !gameManager.isGamePlaying.Value || isChatInputActive)
         {
-            if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity) StopTaskServerRpc(taskInRadius.NetworkObjectId);
+            if (taskInRadius != null && taskInRadius.completingStart.Value != Mathf.Infinity && completingTask)
+            {
+                completingTask = false;
+                StopTaskServerRpc(taskInRadius.NetworkObjectId);
+            }
             return;
         }
         if (taskInRadius == null || taskInRadius.completingStart.Value <= NetworkManager.Singleton.LocalTime.Time) return;
         // Function Called Only if E is pressed, wasn't pressed before, and if within a tasks radius
+        completingTask = true;
         StartTaskServerRpc((float)NetworkManager.Singleton.LocalTime.Time, taskInRadius.NetworkObjectId);
     }
 

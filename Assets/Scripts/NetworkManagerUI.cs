@@ -31,15 +31,19 @@ public class NetworkManagerUI : NetworkBehaviour
 
     private GameManager gameManager;
 
+    private bool connected = false;
+
     private void Awake()
     {
         hostButton.onClick.AddListener(() =>
         {
             CreateRelay();
-            NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
+            NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
             {
-                AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
-                playerNoText.text = "Players In Lobby: 1/6";
+                if (id != 0) return;
+                GameObject newPlayer = NetworkManager.LocalClient.PlayerObject.gameObject;
+                gameManager.playerObjects.Add(newPlayer);
+                playerNoText.text = $"Players In Lobby: {gameManager.playerObjects.Count}/6";
                 lobbyContainer.SetActive(true);
                 loading.SetActive(false);
             };
@@ -49,6 +53,8 @@ public class NetworkManagerUI : NetworkBehaviour
             JoinRelay(gameCodeInput.text);
             NetworkManager.Singleton.OnClientConnectedCallback += (_) =>
             {
+                if (IsServer || connected) return;
+                connected = true;
                 AddGameManagerPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
                 lobbyContainer.SetActive(true);
                 loading.SetActive(false);
@@ -102,7 +108,7 @@ public class NetworkManagerUI : NetworkBehaviour
             inputsContainer.SetActive(false);
             loading.SetActive(true);
 
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(9);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(5);
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             Debug.Log(joinCode);
@@ -141,6 +147,7 @@ public class NetworkManagerUI : NetworkBehaviour
         }
         catch (RelayServiceException e)
         {
+            NetworkManager.Singleton.Shutdown();
             inputsContainer.SetActive(true);
             loading.SetActive(false);
             errorText.SetActive(true);
