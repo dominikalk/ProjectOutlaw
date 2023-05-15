@@ -213,7 +213,7 @@ public class GameManager : NetworkBehaviour
             Debug.Log("Sherrifs Win - Time Ran Out");
         }
 
-        if (!isGamePlaying.Value) return;
+        if (!isGamePlaying.Value || winLossScreen.activeSelf) return;
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.visible = true;
@@ -231,7 +231,6 @@ public class GameManager : NetworkBehaviour
     {
         NetworkManager.Singleton.Shutdown();
         Application.Quit();
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Contains reused code for win loss screen logic
