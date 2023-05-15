@@ -7127,7 +7127,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter message...
+  m_text: Press T to chat ...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0df72cb251b0a5744bd9ea9c7272757f, type: 2}
   m_sharedMaterial: {fileID: -4572021588901832578, guid: 0df72cb251b0a5744bd9ea9c7272757f, type: 2}
