@@ -27,6 +27,8 @@ public class NetworkManagerUI : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI playerNoText;
     [SerializeField] private GameObject errorText;
 
+    [SerializeField] private GameObject instructionsUI;
+
     [SerializeField] private GameObject loading;
 
     private GameManager gameManager;
@@ -166,5 +168,15 @@ public class NetworkManagerUI : NetworkBehaviour
         {
             clientButton.interactable = false;
         }
+    }
+
+    public void ShowInstructionsUI()
+    {
+        instructionsUI.SetActive(true);
+    }
+
+    public void HideInstructionsUI()
+    {
+        instructionsUI.SetActive(false);
     }
 }
