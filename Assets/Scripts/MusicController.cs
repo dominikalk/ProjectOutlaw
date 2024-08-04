@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 public class MusicController : MonoBehaviour
 {
     [SerializeField] private AudioClip[] music;
@@ -17,6 +20,36 @@ public class MusicController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         shuffleArray(music);
         StartCoroutine("playSongs");
+    }
+
+    void Update()
+    {
+        checkToggleMute();
+    }
+
+    private void checkToggleMute()
+    {
+        if (!Input.GetKeyDown(KeyCode.M))
+        {
+            return;
+        }
+
+        TMP_InputField[] inputFields = GameObject.FindObjectsOfType<TMP_InputField>();
+
+        if (inputFields.Any(field => field.isFocused))
+        {
+            return;
+        }
+
+        if (audioSource.volume > 0)
+        {
+            audioSource.volume = 0;
+        }
+        else
+        {
+            audioSource.volume = 1;
+        }
+
     }
 
     private IEnumerator playSongs()
@@ -48,7 +81,7 @@ public class MusicController : MonoBehaviour
         for (int i = 0; i < clips.Length; i++)
         {
             AudioClip temp = clips[i];
-            int r = Random.Range(i, clips.Length);
+            int r = UnityEngine.Random.Range(i, clips.Length);
             clips[i] = clips[r];
             clips[r] = temp;
         }
